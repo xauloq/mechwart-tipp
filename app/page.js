@@ -153,7 +153,7 @@ export default function Page() {
         <section className="hero">
           <div className="hero-l">
             <div className="kick in" style={{ '--i': 0 }}>CS2 · LEAGUE OF LEGENDS</div>
-            <h1><span className="sweep">Tippverseny</span><span className="ttl-u" aria-hidden="true" /></h1>
+            <h1><span className="ttl-w"><span className="sweep">Tippverseny</span><span className="ttl-u" aria-hidden="true" /></span></h1>
             <p className="in" style={{ '--i': 2 }}>Tippelj a Mechwart Esport Bajnokság meccseire, gyűjtsd a pontokat, és legyél te a szezon <b className="gold">Tippkirálya</b>!</p>
             {user ? (
               <div className="stats">
