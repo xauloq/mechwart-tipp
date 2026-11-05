@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { supabase, DEMO, asset, loadPublic, loadMine, saveTip, signIn } from '../lib/supabase';
 import { demoMatches, demoStats, demoBoard, demoUser, demoTips } from '../lib/demo';
@@ -163,7 +164,7 @@ export default function Page() {
             ) : (
               <div className="cta in" style={{ '--i': 3 }}>
                 <button type="button" className="btn big" onClick={login}><Login size={20} /> Belépés Discorddal</button>
-                <span>Egy kattintás – csak a nevedet és a profilképedet látjuk.</span>
+                <span>Egy kattintás – csak a nevedet és a profilképedet látjuk. A belépéssel elfogadod a <Link href="/aszf/">részvételi szabályzatot és az adatkezelést</Link>.</span>
               </div>
             )}
           </div>
@@ -211,14 +212,14 @@ export default function Page() {
           </section>
         )}
         {tab === 'ranglista' && <div key="rl" className="pane"><Board board={board} me={user?.id} /></div>}
-        {tab === 'szabalyok' && <div key="sz" className="pane"><Rules /></div>}
+        {tab === 'szabalyok' && <div key="sz" className="pane"><Rules /><p className="rules-more">A teljes részvételi szabályzat és az adatkezelési tájékoztató: <Link href="/aszf/">ÁSZF és adatkezelés →</Link></p></div>}
 
         <footer className="footer">
           <img src={asset('/logok/deac.png')} alt="DEAC E-sport" />
           <img src={asset('/logok/de.png')} alt="Debreceni Egyetem" />
           <img src={asset('/logok/gepipari.png')} alt="Gépipari" />
           <span className="sp" />
-          <span>Mechwart Esport Bajnokság · <a href="https://www.twitch.tv/mechwartesport" target="_blank" rel="noreferrer">twitch.tv/mechwartesport</a> · <a href="https://discord.gg/FYTkSyappx" target="_blank" rel="noreferrer">Discord</a></span>
+          <span>Mechwart Esport Bajnokság · <a href="https://www.twitch.tv/mechwartesport" target="_blank" rel="noreferrer">twitch.tv/mechwartesport</a> · <a href="https://discord.gg/FYTkSyappx" target="_blank" rel="noreferrer">Discord</a> · <Link href="/aszf/">ÁSZF és adatkezelés</Link></span>
         </footer>
       </main>
 

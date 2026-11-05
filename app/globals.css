@@ -314,3 +314,25 @@ details.past[open] summary svg { transform: rotate(90deg); }
 }
 @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } .prize, .card { transform: none !important; } }
 .card:hover, .card.vis:hover, .prize:hover { transition-delay: 0s !important; }
+
+/* ---------- ÁSZF oldal ---------- */
+.legal { max-width: 860px; padding-top: 40px; }
+.lg-head { margin-bottom: 26px; }
+.lg-head .back { display: inline-block; font-size: 14px; font-weight: 800; color: var(--soft); text-decoration: none; margin-bottom: 26px; padding: 10px 14px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); transition: transform .2s var(--ease); }
+.lg-head .back:hover { transform: translateX(-3px); color: #fff; }
+.lg-head h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 900; letter-spacing: -.03em; line-height: 1.02; margin: 10px 0 12px; }
+.lg-head h1 span { color: var(--blue2); }
+.lg-head p { color: var(--muted); font-weight: 700; font-size: 14px; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+.toc a { font-size: 13px; font-weight: 800; color: var(--soft); text-decoration: none; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line2); background: var(--panel); transition: all .2s var(--ease); }
+.toc a:hover { color: #fff; border-color: var(--red2); transform: translateY(-1px); }
+.lg-sec { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 24px 26px; margin-bottom: 14px; scroll-margin-top: 90px; }
+.lg-sec h2 { font-size: 20px; font-weight: 900; margin-bottom: 12px; }
+.lg-sec p, .lg-sec li { font-size: 15px; line-height: 1.65; color: var(--soft); }
+.lg-sec p + p { margin-top: 10px; }
+.lg-sec b { color: #fff; }
+.lg-sec ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.lg-sec li { position: relative; padding-left: 22px; }
+.lg-sec li::before { content: ''; position: absolute; left: 4px; top: .62em; width: 7px; height: 7px; border-radius: 2px; background: var(--red2); transform: rotate(45deg); }
+.rules-more { margin-top: 18px; font-size: 14px; color: var(--muted); font-weight: 700; }
+.cta span a { color: var(--blue2); }
