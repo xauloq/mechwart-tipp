@@ -331,20 +331,13 @@ details.past[open] summary svg { transform: rotate(90deg); }
 .rules-more { margin-top: 18px; font-size: 14px; color: var(--muted); font-weight: 700; }
 .cta span a { color: var(--blue2); }
 
-/* ---------- Tippverseny felirat: betűnként beúszik, utána hullám ---------- */
-.ttl { display: inline-flex; flex-wrap: wrap; }
-.ttl .lt { display: inline-block; opacity: 0; transform: translateY(.45em) rotateX(70deg); filter: blur(10px); transform-origin: 50% 100%;
-  animation: ltin .9s var(--ease) forwards; animation-delay: calc(.15s + var(--d) * 55ms); }
-.ttl .lt > span { display: inline-block; animation: wave 7s ease-in-out infinite; animation-delay: calc(1.8s + var(--d) * 90ms); transition: transform .25s var(--ease), color .25s, text-shadow .25s; }
-.ttl .lt:nth-child(-n+4) > span { color: #fff; }
-.ttl .lt:nth-child(n+5) > span { color: #e9eefb; }
-.ttl .lt > span:hover { transform: translateY(-10px) scale(1.06); color: var(--red2); text-shadow: 0 0 30px rgba(236,30,36,.55); animation-play-state: paused; }
-@keyframes ltin { to { opacity: 1; transform: none; filter: none; } }
-@keyframes wave {
-  0%, 80%, 100% { transform: none; text-shadow: 0 10px 60px rgba(236,30,36,.0); }
-  85% { transform: translateY(-.12em); text-shadow: 0 0 28px rgba(121,168,255,.55); }
-  90% { transform: none; text-shadow: 0 10px 60px rgba(236,30,36,.0); }
-}
+/* ---------- Tippverseny felirat: jobbról balra futó fénycsík ---------- */
+.sweep { display: inline-block; color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(100deg, #fff 0%, #fff 38%, var(--red2) 46%, var(--blue2) 54%, #fff 62%, #fff 100%);
+  background-size: 300% 100%; background-position: 0% 0; animation: sweeprl 5.5s cubic-bezier(.45, 0, .25, 1) infinite;
+  filter: drop-shadow(0 10px 40px rgba(236,30,36,.25)); }
+@keyframes sweeprl { 0% { background-position: 0% 0; } 55%, 100% { background-position: 100% 0; } }
+@media (prefers-reduced-motion: reduce) { .sweep { animation: none; background-position: 100% 0; } }
 .ttl-u { display: block; height: 5px; width: 0; margin-top: 10px; border-radius: 4px; background: linear-gradient(90deg, var(--red), var(--blue2)); animation: uline 1s .9s var(--ease) forwards; }
 @keyframes uline { to { width: min(320px, 60%); } }
-@media (prefers-reduced-motion: reduce) { .ttl .lt { opacity: 1; transform: none; filter: none; } .ttl-u { width: min(320px, 60%); } }
+@media (prefers-reduced-motion: reduce) { .ttl-u { animation: none; width: min(320px, 60%); } }
