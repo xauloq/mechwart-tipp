@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -84,7 +84,7 @@ export function burst(x, y, colors = ['#ec1e24', '#ff5a5f', '#79a8ff', '#2f6fd6'
 // Görgetésre beúszó elemek (.rv → .vis)
 export function useReveal(deps = []) {
   useEffect(() => {
-    const els = document.querySelectorAll('.rv:not(.vis)');
+    const els = document.querySelectorAll('.rv:not(.vis):not(.card):not(.lr)');
     if (!('IntersectionObserver' in window) || reduced()) { els.forEach((e) => e.classList.add('vis')); return; }
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: .08 });
     els.forEach((e) => io.observe(e));
@@ -102,4 +102,19 @@ export function tilt(e) {
 }
 export function untilt(e) {
   const el = e.currentTarget; el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg');
+}
+
+// Egy elemre: látható-e már (React-állapotban, így egy újrarajzolás nem tünteti el)
+export function useInView() {
+  const ref = useRef(null);
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || vis) return;
+    if (!('IntersectionObserver' in window) || reduced()) { setVis(true); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); io.disconnect(); } }, { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [vis]);
+  return [ref, vis];
 }

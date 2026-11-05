@@ -1,6 +1,20 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Crown } from './icons';
+import { useInView } from './FX';
+
+function Row({ r, me, i }) {
+  const [ref, vis] = useInView();
+  return (
+    <div ref={ref} className={`lr rv${vis ? ' vis' : ''}${r.user_id === me ? ' me' : ''}`} style={{ '--i': i % 8 }}>
+      <span className="rk">{r.rank}.</span>
+      <Avatar name={r.name} url={r.avatar_url} />
+      <span className="nm">{r.name}</span>
+      <span className="acc">{r.correct}/{r.decided} talált</span>
+      <span className="pts"><CountUp value={r.points} /></span>
+    </div>
+  );
+}
 
 export function CountUp({ value, ms = 900 }) {
   const [v, setV] = useState(0);
@@ -51,15 +65,7 @@ export default function Board({ board, me }) {
         ) : <div key={k} />)}
       </div>
       <div className="lb-list">
-        {rows.map((r, i) => (
-          <div key={r.user_id} className={`lr rv${r.user_id === me ? ' me' : ''}`} style={{ '--i': i % 8 }}>
-            <span className="rk">{r.rank}.</span>
-            <Avatar name={r.name} url={r.avatar_url} />
-            <span className="nm">{r.name}</span>
-            <span className="acc">{r.correct}/{r.decided} talált</span>
-            <span className="pts"><CountUp value={r.points} /></span>
-          </div>
-        ))}
+        {rows.map((r, i) => <Row key={r.user_id} r={r} me={me} i={i} />)}
       </div>
     </section>
   );

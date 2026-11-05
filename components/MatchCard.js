@@ -1,6 +1,6 @@
 'use client';
 import { Check, Lock, Clock } from './icons';
-import { tilt, untilt } from './FX';
+import { tilt, untilt, useInView } from './FX';
 
 const TZ = 'Europe/Budapest';
 export const fmtTime = (iso) => new Date(iso).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
@@ -31,6 +31,7 @@ function ripple(e) {
 }
 
 export default function MatchCard({ m, tip, stat, user, now, onPick, onNeedLogin, i = 0 }) {
+  const [ref, vis] = useInView();
   const ko = new Date(m.kickoff).getTime();
   const decided = m.winner === 1 || m.winner === 2;
   const locked = decided || ko <= now;
@@ -69,7 +70,7 @@ export default function MatchCard({ m, tip, stat, user, now, onPick, onNeedLogin
   const p1 = stat?.pick1, p2 = stat?.pick2, tot = (p1 ?? 0) + (p2 ?? 0);
 
   return (
-    <article className={`card rv${locked ? ' locked' : ''}${pick ? ' picked p' + pick : ''}`} style={{ '--i': i % 6 }} onPointerMove={tilt} onPointerLeave={untilt}>
+    <article ref={ref} className={`card rv${vis ? ' vis' : ''}${locked ? ' locked' : ''}${pick ? ' picked p' + pick : ''}`} style={{ '--i': i % 6 }} onPointerMove={tilt} onPointerLeave={untilt}>
       <span className="glow" aria-hidden="true" />
       <div className="meta">
         <span className={`tag ${m.game}`}>{m.game === 'cs2' ? 'CS2' : 'LOL'}</span>
