@@ -21,6 +21,7 @@ const S = [
     <ul>
       <li>Bárki, aki rendelkezik saját <b>Discord-fiókkal</b>, és azzal belép az oldalra. (A Discord saját szabályai szerint fiókot 13 éves kortól lehet létrehozni.)</li>
       <li>A bajnokság játékosai is részt vehetnek, és a saját csapatuk meccsére is tippelhetnek.</li>
+      <li>A Szervező (1. pont), aki a meccsek eredményét rögzíti, a Tippversenyben nem vesz részt: tippet nem adhat le, és a ranglistán nem szerepel.</li>
       <li>Egy személy <b>csak egy fiókkal</b> vehet részt.</li>
       <li>A belépéssel és az első tipp leadásával a résztvevő elfogadja ezt a szabályzatot és az adatkezelési tájékoztatót (9. pont). <b>16 év alatti</b> résztvevő a szülője vagy törvényes képviselője hozzájárulásával vehet részt.</li>
     </ul>

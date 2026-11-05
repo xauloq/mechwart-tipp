@@ -84,6 +84,7 @@ export default function Page() {
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
 
   const onPick = useCallback(async (matchId, pick, series, at) => {
+    if (admin) { toast('Szervezőként nem tippelsz, így az eredmények beírása tisztességes marad.', true); return; }
     const m = matches.find((x) => x.id === matchId);
     const prev = tips[matchId];
     const next = { match_id: matchId, pick, series: series === undefined ? prev?.series ?? null : series };
@@ -100,7 +101,7 @@ export default function Page() {
       party();
       toast(`Tipp mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`);
     }
-  }, [matches, tips, toast, refreshPublic]);
+  }, [matches, tips, toast, refreshPublic, admin]);
 
   const needLogin = useCallback(() => toast('A tippeléshez lépj be a Discord-fiókoddal!', true), [toast]);
   const login = async () => { if (DEMO) return toast('Demó mód: a belépéshez állítsd be a Supabase-t (lásd OLVASSEL).', true); const { error } = await signIn(); if (error) toast('A belépés nem sikerült.', true); };
@@ -157,7 +158,13 @@ export default function Page() {
             <div className="kick in" style={{ '--i': 0 }}>CS2 · LEAGUE OF LEGENDS</div>
             <h1><span className="sweep">Tippverseny</span></h1>
             <p className="in" style={{ '--i': 2 }}>Tippelj a Mechwart Esport Bajnokság meccseire, gyűjtsd a pontokat, és legyél te a szezon <b className="gold">Tippkirálya</b>!</p>
-            {user ? (
+            {user && admin ? (
+              <div className="org in" style={{ '--i': 3 }}>
+                <b>Szervezőként nem tippelsz</b>
+                <span>Te írod be az eredményeket, ezért a fiókod nem vesz részt a tippversenyben, és a ranglistán sem szerepel.</span>
+                <Link href="/admin/" className="btn sm"><Edit size={16} /> Szervezői felület</Link>
+              </div>
+            ) : user ? (
               <div className="stats">
                 <div className="stat in" style={{ '--i': 3 }}><b><CountUp value={me?.points ?? 0} /></b><span>Pontod</span></div>
                 <div className="stat in" style={{ '--i': 4 }}><b>{me ? `${me.rank}.` : '–'}</b><span>Helyezés</span></div>

@@ -456,3 +456,10 @@ a.btn { text-decoration: none; }
 .cnote-a a { font-size: 14px; font-weight: 800; color: var(--blue2); text-decoration: none; }
 .cnote-a a:hover { text-decoration: underline; }
 @media (max-width: 640px) { .cnote { left: 12px; right: 12px; bottom: 12px; max-width: none; } }
+
+/* szervezői jelzés a főoldalon */
+.org { margin-top: 26px; display: grid; gap: 8px; justify-items: start; max-width: 560px; padding: 18px 20px; border-radius: 18px;
+  background: rgba(255,207,74,.07); border: 1px solid rgba(255,207,74,.32); }
+.org b { font-size: 17px; font-weight: 900; color: #ffe08a; }
+.org span { font-size: 15px; line-height: 1.5; color: var(--soft); }
+.org .btn { margin-top: 6px; }
