@@ -13,3 +13,7 @@ export const Users = (p) => <S {...p}><circle cx="9" cy="8" r="3.5" /><path d="M
 export const Trophy = (p) => <S {...p}><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" /><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3" /></S>;
 export const Gift = (p) => <S {...p}><rect x="3" y="8" width="18" height="13" rx="1.5" /><path d="M3 12h18M12 8v13" /><path d="M12 8c-1.5-3-5-3.5-5-1.3S10 8 12 8zM12 8c1.5-3 5-3.5 5-1.3S14 8 12 8z" /></S>;
 export const Shield = (p) => <S {...p}><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z" /></S>;
+export const Edit = (p) => <S {...p}><path d="M4 20h4L19 9l-4-4L4 16v4z" /><path d="M13.5 6.5l4 4" /></S>;
+export const Plus = (p) => <S {...p}><path d="M12 5v14M5 12h14" /></S>;
+export const Trash = (p) => <S {...p}><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></S>;
+export const Refresh = (p) => <S {...p}><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.6 4.5L20 16M20 20v-4h-4" /></S>;

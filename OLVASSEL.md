@@ -48,6 +48,19 @@ Ezután: nyisd meg az oldalt → **Belépés Discorddal** → tippelj egyet pró
 
 SQL Editor → New query → a `supabase/frissites_2.sql` tartalma → Run. (Új projektnél elég a `schema.sql`, abban már benne van.)
 
+## Szervezői felület – mechwartesport.xyz/admin
+
+Egyszeri beállítás: lépj be az oldalra a **d3lta4k** Discord-fiókkal, majd SQL Editor → New query → a `supabase/frissites_3_admin.sql` tartalma → Run. A végén egy sornak kell megjelennie a d3lta4k névvel. Ezután a főoldal fejlécében megjelenik a **Szervezés** gomb (csak neked).
+
+Itt lehet:
+- **eredményt beírni**: a „Teendő” fülön ott vannak az elkezdett, még eredmény nélküli meccsek. Beírod az állást, a győztes magától kijelölődik (LoL Bo1-nél elég a győztesre kattintani), majd Eredmény mentése. Elrontott eredmény javítható vagy visszavonható.
+- **időpontot módosítani, csapatnevet javítani**: Szerkesztés gomb a meccsen
+- **új meccset felvenni**: Új meccs gomb (játék, formátum, kör, csapatok, kezdés magyar idő szerint, pontozás: Alap 1 / Playoff 2 +1)
+- **csapatot átnevezni** az összes meccsén egyszerre: az oldal alján
+- **meccset törölni**: csak amíg senki nem tippelt rá
+
+A jogosultságot az adatbázis ellenőrzi: más fiókkal az oldal nem enged szerkeszteni, akkor sem, ha valaki megtalálja a címet.
+
 ## Meccsnapon
 
 **Eredmény beírása** (meccs után): Supabase → **Table Editor → matches** → a meccs sorában `winner` = 1 (az első csapat nyert) vagy 2, `score1` / `score2` = végeredmény (Bo1-nél a körök, pl. 13 és 9) → Save. A ranglista azonnal frissül.

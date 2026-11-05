@@ -1,12 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { supabase, DEMO, asset, loadPublic, loadMine, saveTip, signIn } from '../lib/supabase';
+import { supabase, DEMO, asset, loadPublic, loadMine, saveTip, signIn, isAdmin } from '../lib/supabase';
 import { demoMatches, demoStats, demoBoard, demoUser, demoTips } from '../lib/demo';
 import MatchCard from '../components/MatchCard';
 import Board, { Avatar, CountUp, ranked } from '../components/Board';
 import Rules from '../components/Rules';
-import { Login, Logout, Chev } from '../components/icons';
+import { Login, Logout, Chev, Edit } from '../components/icons';
 import { Particles, Spotlight, burst, useReveal } from '../components/FX';
 import Prize from '../components/Prize';
 import Ticker from '../components/Ticker';
@@ -37,6 +37,7 @@ export default function Page() {
   const [now, setNow] = useState(() => Date.now());
   const [toasts, setToasts] = useState([]);
   const [ready, setReady] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
   const toast = useCallback((text, err = false) => {
     const id = Math.random();
@@ -69,10 +70,10 @@ export default function Page() {
       return;
     }
     refreshPublic();
-    supabase.auth.getSession().then(({ data }) => { const u = userFrom(data.session); setUser(u); if (u) refreshMine(); });
+    supabase.auth.getSession().then(({ data }) => { const u = userFrom(data.session); setUser(u); if (u) { refreshMine(); isAdmin().then(setAdmin); } });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = userFrom(session); setUser(u);
-      if (u) refreshMine(); else setTips({});
+      if (u) { refreshMine(); isAdmin().then(setAdmin); } else { setTips({}); setAdmin(false); }
     });
     const iv = setInterval(refreshPublic, 60000);
     const vis = () => document.visibilityState === 'visible' && refreshPublic();
@@ -135,6 +136,7 @@ export default function Page() {
           <div className="mark" />
           <div className="brand"><small>MECHWART</small><b>Tippverseny</b></div>
           <div className="sp" />
+          {admin && <Link href="/admin/" className="btn ghost sm adm-link"><Edit size={16} /><span>Szervezés</span></Link>}
           {user ? (
             <div className="user">
               <Avatar name={user.name} url={user.avatar} />
