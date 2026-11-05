@@ -20,10 +20,7 @@ a { color: var(--blue2); }
 .bg::after { content: ''; position: absolute; inset: 0;
   background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 64px 64px; mask-image: radial-gradient(80% 70% at 50% 30%, #000 30%, transparent 100%); opacity: .6; }
-.scan { position: absolute; left: 0; right: 0; height: 160px; top: -160px;
-  background: linear-gradient(180deg, transparent, rgba(121,168,255,.06), transparent); animation: scan 9s linear infinite; }
 @keyframes drift { from { transform: translate(-3%, -2%) scale(1); } to { transform: translate(3%, 2%) scale(1.08); } }
-@keyframes scan { to { transform: translateY(calc(100vh + 320px)); } }
 
 .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 0 20px 80px; }
 
@@ -57,8 +54,6 @@ a { color: var(--blue2); }
 .hero { padding: 56px 0 30px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: center; }
 .kick { font-size: 14px; font-weight: 800; letter-spacing: .3em; color: var(--red); }
 .hero h1 { font-size: clamp(52px, 8vw, 96px); font-weight: 900; letter-spacing: -.035em; line-height: .95; margin: 12px 0 16px; text-shadow: 0 10px 60px rgba(236,30,36,.28); }
-.hero h1 span { display: inline-block; background: linear-gradient(90deg, #fff 0%, #fff 40%, var(--blue2) 50%, #fff 60%, #fff 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: sweep 6s ease-in-out infinite; }
-@keyframes sweep { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
 .hero p { font-size: 18px; line-height: 1.55; color: var(--soft); max-width: 560px; }
 .hero-l .stats { margin-top: 26px; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
@@ -215,7 +210,6 @@ details.past[open] summary svg { transform: rotate(90deg); }
 .spot { position: absolute; left: 0; top: 0; width: 600px; height: 600px; z-index: 0; pointer-events: none; border-radius: 50%;
   background: radial-gradient(closest-side, rgba(121,168,255,.10), rgba(236,30,36,.05) 55%, transparent 70%); will-change: transform; }
 .gold { color: var(--gold); }
-.hero h1 span:nth-child(2) { animation-delay: -3s; }
 .btn.big { font-size: 17px; padding: 16px 24px; border-radius: 14px; }
 
 /* görgetésre beúszás */
@@ -336,3 +330,21 @@ details.past[open] summary svg { transform: rotate(90deg); }
 .lg-sec li::before { content: ''; position: absolute; left: 4px; top: .62em; width: 7px; height: 7px; border-radius: 2px; background: var(--red2); transform: rotate(45deg); }
 .rules-more { margin-top: 18px; font-size: 14px; color: var(--muted); font-weight: 700; }
 .cta span a { color: var(--blue2); }
+
+/* ---------- Tippverseny felirat: betűnként beúszik, utána hullám ---------- */
+.ttl { display: inline-flex; flex-wrap: wrap; }
+.ttl .lt { display: inline-block; opacity: 0; transform: translateY(.45em) rotateX(70deg); filter: blur(10px); transform-origin: 50% 100%;
+  animation: ltin .9s var(--ease) forwards; animation-delay: calc(.15s + var(--d) * 55ms); }
+.ttl .lt > span { display: inline-block; animation: wave 7s ease-in-out infinite; animation-delay: calc(1.8s + var(--d) * 90ms); transition: transform .25s var(--ease), color .25s, text-shadow .25s; }
+.ttl .lt:nth-child(-n+4) > span { color: #fff; }
+.ttl .lt:nth-child(n+5) > span { color: #e9eefb; }
+.ttl .lt > span:hover { transform: translateY(-10px) scale(1.06); color: var(--red2); text-shadow: 0 0 30px rgba(236,30,36,.55); animation-play-state: paused; }
+@keyframes ltin { to { opacity: 1; transform: none; filter: none; } }
+@keyframes wave {
+  0%, 80%, 100% { transform: none; text-shadow: 0 10px 60px rgba(236,30,36,.0); }
+  85% { transform: translateY(-.12em); text-shadow: 0 0 28px rgba(121,168,255,.55); }
+  90% { transform: none; text-shadow: 0 10px 60px rgba(236,30,36,.0); }
+}
+.ttl-u { display: block; height: 5px; width: 0; margin-top: 10px; border-radius: 4px; background: linear-gradient(90deg, var(--red), var(--blue2)); animation: uline 1s .9s var(--ease) forwards; }
+@keyframes uline { to { width: min(320px, 60%); } }
+@media (prefers-reduced-motion: reduce) { .ttl .lt { opacity: 1; transform: none; filter: none; } .ttl-u { width: min(320px, 60%); } }
