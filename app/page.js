@@ -215,9 +215,9 @@ export default function Page() {
         {tab === 'szabalyok' && <div key="sz" className="pane"><Rules /><p className="rules-more">A teljes részvételi szabályzat és az adatkezelési tájékoztató: <Link href="/aszf/">ÁSZF és adatkezelés →</Link></p></div>}
 
         <footer className="footer">
-          <img src={asset('/logok/deac.png')} alt="DEAC E-sport" />
-          <img src={asset('/logok/de.png')} alt="Debreceni Egyetem" />
-          <img src={asset('/logok/gepipari.png')} alt="Gépipari" />
+          <a className="flogo" href="https://deac.hu/egyeb-szakosztalyok/deac-esport/" target="_blank" rel="noreferrer" title="DEAC E-sport"><img src={asset('/logok/deac.png')} alt="DEAC E-sport" /></a>
+          <a className="flogo" href="https://unideb.hu/" target="_blank" rel="noreferrer" title="Debreceni Egyetem"><img src={asset('/logok/de.png')} alt="Debreceni Egyetem" /></a>
+          <a className="flogo" href="https://www.dszcmechwart.hu/" target="_blank" rel="noreferrer" title="Debreceni SZC Mechwart András Gépipari és Informatikai Technikum"><img src={asset('/logok/gepipari.png')} alt="Debreceni SZC Mechwart András Gépipari és Informatikai Technikum" /></a>
           <span className="sp" />
           <span>Mechwart Esport Bajnokság · <a href="https://www.twitch.tv/mechwartesport" target="_blank" rel="noreferrer">twitch.tv/mechwartesport</a> · <a href="https://discord.gg/FYTkSyappx" target="_blank" rel="noreferrer">Discord</a> · <Link href="/aszf/">ÁSZF és adatkezelés</Link></span>
         </footer>

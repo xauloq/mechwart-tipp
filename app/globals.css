@@ -348,3 +348,7 @@ details.past[open] summary svg { transform: rotate(90deg); }
 @keyframes uline { to { transform: scaleX(1); } }
 @keyframes ushine { 0%, 12% { left: -18%; } 88%, 100% { left: 100%; } }
 @media (prefers-reduced-motion: reduce) { .sweep, .ttl-u::after { animation: none; } .ttl-u { animation: none; transform: none; } }
+
+.flogo { display: inline-flex; border-radius: 12px; padding: 4px; transition: transform .25s var(--ease), background .25s; }
+.flogo:hover { transform: translateY(-3px) scale(1.06); background: rgba(255,255,255,.05); }
+.flogo:focus-visible { outline: 2px solid var(--blue2); outline-offset: 2px; }
