@@ -48,6 +48,11 @@ Ezután: nyisd meg az oldalt → **Belépés Discorddal** → tippelj egyet pró
 
 SQL Editor → New query → a `supabase/frissites_2.sql` tartalma → Run. (Új projektnél elég a `schema.sql`, abban már benne van.)
 
+## Biztonsági frissítés (nov. 5.) – a Supabase figyelmeztetései
+
+SQL Editor → New query → a `supabase/frissites_4_biztonsag.sql` tartalma → Run. Ez a 2. és 3. frissítést is tartalmazza. (Új projektnél: `schema.sql`, utána ez.)
+Authentication → Sign In / Providers → **Email** kikapcsolása (csak Discorddal lehet belépni, így senki nem tud e-mailes kamufiókokat csinálni). Ettől a „Leaked Password Protection” figyelmeztetés lényegtelen.
+
 ## Szervezői felület – mechwartesport.xyz/admin
 
 Egyszeri beállítás: lépj be az oldalra a **d3lta4k** Discord-fiókkal, majd SQL Editor → New query → a `supabase/frissites_3_admin.sql` tartalma → Run. A végén egy sornak kell megjelennie a d3lta4k névvel. Ezután a főoldal fejlécében megjelenik a **Szervezés** gomb (csak neked).

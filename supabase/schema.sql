@@ -2,6 +2,7 @@
 --  MECHWART TIPPVERSENY – Supabase adatbázis
 --  Futtatás: Supabase → SQL Editor → New query → az egész fájl bemásolva → Run
 --  Többször is lefuttatható: a meglévő táblákat és adatokat nem törli.
+--  UTÁNA MINDIG futtasd a frissites_4_biztonsag.sql-t is (biztonsági javítások + szervezői felület).
 -- =====================================================================
 
 -- ---------- 1. Táblák ----------
