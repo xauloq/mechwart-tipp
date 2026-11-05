@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 
-// Saját kurzor: kis pont + rugalmasan utána úszó gyűrű. A rendes egérmutató is megmarad.
+// Saját kurzor: kis pont + rugalmasan utána úszó gyűrű, a rendes egérmutató helyett.
 // Csak egérrel működik (telefonon nincs). Csökkentett animációnál a gyűrű késleltetés nélkül követ.
 const HOT = '.team, .am-team, a, button, [role=tab], summary, label, input, select, textarea, .card, .prize';
 
@@ -23,6 +23,7 @@ export default function Cursor() {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const d = dot.current, r = ring.current;
     let x = -100, y = -100, rx = x, ry = y, raf = 0, on = false;
+    document.documentElement.classList.add('cur-hide');
     const show = (v) => { if (v !== on) { on = v; d.classList.toggle('on', v); r.classList.toggle('on', v); } };
     const move = (e) => {
       if (e.pointerType && e.pointerType !== 'mouse') return;
@@ -47,6 +48,7 @@ export default function Cursor() {
     document.addEventListener('mouseout', out); document.addEventListener('visibilitychange', vis);
     loop();
     return () => {
+      document.documentElement.classList.remove('cur-hide');
       cancelAnimationFrame(raf);
       removeEventListener('pointermove', move); removeEventListener('pointerdown', down); removeEventListener('pointerup', up);
       document.removeEventListener('mouseout', out); document.removeEventListener('visibilitychange', vis);
