@@ -35,7 +35,7 @@ export function ranked(board) {
 
 export default function Board({ board, me }) {
   const rows = ranked(board);
-  if (!rows.length) return <div className="empty in">Még senki nem tippelt. Légy te az első!</div>;
+  if (!rows.length) return <div className="empty in">A ranglista az első lejátszott meccs után jelenik meg. Addig is: tippelj!</div>;
   const top = [rows[1], rows[0], rows[2]];
   return (
     <section>
@@ -52,7 +52,7 @@ export default function Board({ board, me }) {
       </div>
       <div className="lb-list">
         {rows.map((r, i) => (
-          <div key={r.user_id} className={`lr in${r.user_id === me ? ' me' : ''}`} style={{ '--i': Math.min(i, 20) }}>
+          <div key={r.user_id} className={`lr rv${r.user_id === me ? ' me' : ''}`} style={{ '--i': i % 8 }}>
             <span className="rk">{r.rank}.</span>
             <Avatar name={r.name} url={r.avatar_url} />
             <span className="nm">{r.name}</span>

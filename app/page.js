@@ -1,11 +1,15 @@
 'use client';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { supabase, DEMO, asset, loadPublic, loadMine, saveTip, signIn } from '../lib/supabase';
-import { demoMatches, demoStats, demoBoard, demoUser, demoTips, demoOwn } from '../lib/demo';
+import { demoMatches, demoStats, demoBoard, demoUser, demoTips } from '../lib/demo';
 import MatchCard from '../components/MatchCard';
 import Board, { Avatar, CountUp, ranked } from '../components/Board';
 import Rules from '../components/Rules';
 import { Login, Logout, Chev } from '../components/icons';
+import { Particles, Spotlight, burst, useReveal } from '../components/FX';
+import Prize from '../components/Prize';
+import Ticker from '../components/Ticker';
+import { Countdown } from '../components/Roll';
 
 const TZ = 'Europe/Budapest';
 const dayKey = (iso) => new Date(iso).toLocaleDateString('sv-SE', { timeZone: TZ });
@@ -26,7 +30,6 @@ export default function Page() {
   const [stats, setStats] = useState({});
   const [board, setBoard] = useState([]);
   const [tips, setTips] = useState({});
-  const [own, setOwn] = useState(new Set());
   const [user, setUser] = useState(null);
   const [tab, setTab] = useState('tippek');
   const [game, setGame] = useState('all');
@@ -55,13 +58,12 @@ export default function Page() {
     if (DEMO || !supabase) return;
     const d = await loadMine();
     setTips(Object.fromEntries(d.tips.map((t) => [t.match_id, t])));
-    setOwn(new Set(d.own));
   }, []);
 
   useEffect(() => {
     if (DEMO) {
       setMatches(demoMatches); setStats(Object.fromEntries(demoStats.map((s) => [s.match_id, s])));
-      setBoard(demoBoard); setUser(demoUser); setTips(Object.fromEntries(demoTips.map((t) => [t.match_id, t]))); setOwn(new Set(demoOwn));
+      setBoard(demoBoard); setUser(demoUser); setTips(Object.fromEntries(demoTips.map((t) => [t.match_id, t])));
       setReady(true);
       return;
     }
@@ -69,7 +71,7 @@ export default function Page() {
     supabase.auth.getSession().then(({ data }) => { const u = userFrom(data.session); setUser(u); if (u) refreshMine(); });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = userFrom(session); setUser(u);
-      if (u) refreshMine(); else { setTips({}); setOwn(new Set()); }
+      if (u) refreshMine(); else setTips({});
     });
     const iv = setInterval(refreshPublic, 60000);
     const vis = () => document.visibilityState === 'visible' && refreshPublic();
@@ -79,19 +81,21 @@ export default function Page() {
 
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
 
-  const onPick = useCallback(async (matchId, pick, series) => {
+  const onPick = useCallback(async (matchId, pick, series, at) => {
     const m = matches.find((x) => x.id === matchId);
     const prev = tips[matchId];
     const next = { match_id: matchId, pick, series: series === undefined ? prev?.series ?? null : series };
     if (prev?.pick !== pick && series === null) next.series = null;
     setTips((t) => ({ ...t, [matchId]: next }));
-    if (DEMO) { toast(`Tipp mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`); return; }
+    const party = () => at && burst(at.x, at.y, pick === 1 ? ['#ec1e24', '#ff5a5f', '#ffffff', '#ffcf4a'] : ['#2f6fd6', '#79a8ff', '#ffffff', '#ffcf4a']);
+    if (DEMO) { party(); toast(`Tipp mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`); return; }
     const err = await saveTip(matchId, pick, next.series);
     if (err) {
       setTips((t) => { const c = { ...t }; if (prev) c[matchId] = prev; else delete c[matchId]; return c; });
       toast(/row-level security|violates/i.test(err.message) ? 'Erre a meccsre már nem lehet tippelni.' : 'Nem sikerült menteni a tippet. Próbáld újra!', true);
       refreshPublic();
     } else {
+      party();
       toast(`Tipp mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`);
     }
   }, [matches, tips, toast, refreshPublic]);
@@ -110,6 +114,9 @@ export default function Page() {
   }, [upcoming]);
 
   const me = user ? ranked(board).find((r) => r.user_id === user.id) : null;
+  const nextOpen = matches.find((m) => !(m.winner === 1 || m.winner === 2) && new Date(m.kickoff).getTime() > now);
+  const ticker = matches.filter((m) => !(m.winner === 1 || m.winner === 2) && new Date(m.kickoff).getTime() > now - 3 * 3600000);
+  useReveal([tab, game, matches.length, ready]);
   const myTips = Object.keys(tips).length;
 
   // fül-jelző
@@ -121,6 +128,7 @@ export default function Page() {
   let n = 0;
   return (
     <>
+      <div className="fxw" aria-hidden="true"><Particles /><Spotlight /></div>
       <header className="top">
         <div className="row">
           <div className="mark" />
@@ -142,25 +150,28 @@ export default function Page() {
         {DEMO && <div className="demo in">Demó mód – kitalált adatok. A Supabase beállítása után itt az igazi meccsek és tippek látszanak.</div>}
 
         <section className="hero">
-          <div>
+          <div className="hero-l">
             <div className="kick in" style={{ '--i': 0 }}>CS2 · LEAGUE OF LEGENDS</div>
-            <h1 className="in" style={{ '--i': 1 }}><span>Tippverseny</span></h1>
-            <p className="in" style={{ '--i': 2 }}>Tippelj a Mechwart Esport Bajnokság meccseire, gyűjtsd a pontokat, és legyél te a szezon <b style={{ color: '#ffcf4a' }}>Tippkirálya</b>!</p>
+            <h1 className="in" style={{ '--i': 1 }}><span>Tipp</span><span>verseny</span></h1>
+            <p className="in" style={{ '--i': 2 }}>Tippelj a Mechwart Esport Bajnokság meccseire, gyűjtsd a pontokat, és legyél te a szezon <b className="gold">Tippkirálya</b>!</p>
+            {user ? (
+              <div className="stats">
+                <div className="stat in" style={{ '--i': 3 }}><b><CountUp value={me?.points ?? 0} /></b><span>Pontod</span></div>
+                <div className="stat in" style={{ '--i': 4 }}><b>{me ? `${me.rank}.` : '–'}</b><span>Helyezés</span></div>
+                <div className="stat in" style={{ '--i': 5 }}><b><CountUp value={myTips} /></b><span>Tipped</span></div>
+              </div>
+            ) : (
+              <div className="cta in" style={{ '--i': 3 }}>
+                <button type="button" className="btn big" onClick={login}><Login size={20} /> Belépés Discorddal</button>
+                <span>Egy kattintás – csak a nevedet és a profilképedet látjuk.</span>
+              </div>
+            )}
           </div>
-          {user ? (
-            <div className="stats">
-              <div className="stat in" style={{ '--i': 3 }}><b><CountUp value={me?.points ?? 0} /></b><span>Pontod</span></div>
-              <div className="stat in" style={{ '--i': 4 }}><b>{me ? `${me.rank}.` : '–'}</b><span>Helyezés</span></div>
-              <div className="stat in" style={{ '--i': 5 }}><b><CountUp value={myTips} /></b><span>Tipped</span></div>
-            </div>
-          ) : (
-            <div className="cta in" style={{ '--i': 3 }}>
-              <h3>Lépj be, és tippelj!</h3>
-              <p>A Discord-fiókoddal egy kattintással belépsz. Csak a nevedet és a profilképedet látjuk.</p>
-              <button type="button" className="btn" onClick={login}><Login size={18} /> Belépés Discorddal</button>
-            </div>
-          )}
+          <Prize />
         </section>
+
+        {nextOpen && <Countdown ms={new Date(nextOpen.kickoff).getTime() - now} label="KÖVETKEZŐ TIPPZÁRÁS" sub={`${nextOpen.team1} – ${nextOpen.team2}`} />}
+        <Ticker matches={ticker} />
 
         <nav className="tabs" role="tablist" aria-label="Oldalak">
           {TABS.map(([k, l]) => (
@@ -170,7 +181,7 @@ export default function Page() {
         </nav>
 
         {tab === 'tippek' && (
-          <section key="tippek">
+          <section key="tippek" className="pane">
             <div className="chips" role="group" aria-label="Szűrés játék szerint">
               {[['all', 'Mind'], ['cs2', 'CS2'], ['lol', 'LoL']].map(([k, l]) => (
                 <button key={k} type="button" className="chip" aria-pressed={game === k} onClick={() => setGame(k)}>{l}</button>
@@ -179,10 +190,10 @@ export default function Page() {
             {ready && days.length === 0 && <div className="empty in">Most nincs nyitott meccs. A következő kör párosítása hamarosan érkezik!</div>}
             {days.map((list) => (
               <div className="day" key={dayKey(list[0].kickoff) + game}>
-                <div className="dh in"><h2>{dayName(list[0].kickoff)}</h2><span>{dayDate(list[0].kickoff)}</span></div>
+                <div className="dh rv"><h2>{dayName(list[0].kickoff)}</h2><span>{dayDate(list[0].kickoff)}</span></div>
                 <div className="grid">
                   {list.map((m) => (
-                    <MatchCard key={m.id} i={n++} m={m} tip={tips[m.id]} stat={stats[m.id]} own={own.has(m.id)} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
+                    <MatchCard key={m.id} i={n++} m={m} tip={tips[m.id]} stat={stats[m.id]} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
                   ))}
                 </div>
               </div>
@@ -192,15 +203,15 @@ export default function Page() {
                 <summary><Chev size={18} /> Lejátszott meccsek ({past.length})</summary>
                 <div className="grid">
                   {past.map((m, i) => (
-                    <MatchCard key={m.id} i={i} m={m} tip={tips[m.id]} stat={stats[m.id]} own={own.has(m.id)} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
+                    <MatchCard key={m.id} i={i} m={m} tip={tips[m.id]} stat={stats[m.id]} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
                   ))}
                 </div>
               </details>
             )}
           </section>
         )}
-        {tab === 'ranglista' && <Board key="rl" board={board} me={user?.id} />}
-        {tab === 'szabalyok' && <Rules key="sz" />}
+        {tab === 'ranglista' && <div key="rl" className="pane"><Board board={board} me={user?.id} /></div>}
+        {tab === 'szabalyok' && <div key="sz" className="pane"><Rules /></div>}
 
         <footer className="footer">
           <img src={asset('/logok/deac.png')} alt="DEAC E-sport" />

@@ -29,7 +29,7 @@ create table if not exists public.profiles (
   created_at   timestamptz not null default now()
 );
 
--- a nevezési lista Discord-nevei: a saját csapat meccsére nem lehet tippelni
+-- a nevezési lista Discord-nevei (jelenleg nem korlátoz semmit, csak nyilvántartás)
 create table if not exists public.team_members (
   game    text not null,
   team    text not null,
@@ -88,12 +88,11 @@ returns boolean language sql stable security definer set search_path = '' as $$
   );
 $$;
 
--- lehet-e még tippelni: a kezdés előtt, eredmény nélkül, nem a saját meccsre
+-- lehet-e még tippelni: a kezdés előtt, amíg nincs eredmény (a saját csapatára is bárki tippelhet)
 create or replace function public.can_tip(p_match text)
 returns boolean language sql stable security definer set search_path = '' as $$
   select exists (select 1 from public.matches m
-                 where m.id = p_match and m.kickoff > now() and m.winner is null)
-     and not public.is_own_match(p_match);
+                 where m.id = p_match and m.kickoff > now() and m.winner is null);
 $$;
 
 -- a belépett felhasználó saját meccsei (a weboldal ezeket szürkén mutatja)
@@ -151,7 +150,8 @@ select p.id as user_id,
 from public.profiles p
 join public.tips t on t.user_id = p.id
 join public.matches m on m.id = t.match_id
-group by p.id;
+group by p.id
+having count(*) filter (where m.winner is not null) > 0;   -- csak akinek már van kiértékelt tippje
 
 create or replace view public.tip_stats as
 select m.id as match_id,

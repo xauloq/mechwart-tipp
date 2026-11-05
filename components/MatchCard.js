@@ -1,5 +1,6 @@
 'use client';
 import { Check, Lock, Clock } from './icons';
+import { tilt, untilt } from './FX';
 
 const TZ = 'Europe/Budapest';
 export const fmtTime = (iso) => new Date(iso).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
@@ -29,20 +30,19 @@ function ripple(e) {
   b.appendChild(s); setTimeout(() => s.remove(), 700);
 }
 
-export default function MatchCard({ m, tip, stat, own, user, now, onPick, onNeedLogin, i = 0 }) {
+export default function MatchCard({ m, tip, stat, user, now, onPick, onNeedLogin, i = 0 }) {
   const ko = new Date(m.kickoff).getTime();
   const decided = m.winner === 1 || m.winner === 2;
   const locked = decided || ko <= now;
   const pick = tip?.pick;
   const opts = seriesOptions(m.format, pick);
-  const blocked = user && own;
 
   const click = (side) => (e) => {
-    if (locked || blocked) return;
+    if (locked) return;
     ripple(e);
     if (!user) return onNeedLogin();
     if (pick === side) return;
-    onPick(m.id, side, opts.length ? null : undefined);
+    onPick(m.id, side, opts.length ? null : undefined, { x: e.clientX, y: e.clientY, side });
   };
 
   const team = (side) => {
@@ -50,7 +50,7 @@ export default function MatchCard({ m, tip, stat, own, user, now, onPick, onNeed
     const cls = ['team', `t${side}`, pick === side ? 'on' : '', decided && m.winner === side ? 'win' : ''].join(' ');
     const label = locked ? `${name}${pick === side ? ' – a tipped' : ''}` : `Tipp: ${name} nyer`;
     return (
-      <button type="button" className={cls} onClick={click(side)} disabled={locked || blocked} aria-pressed={pick === side} aria-label={label}>
+      <button type="button" className={cls} onClick={click(side)} disabled={locked} aria-pressed={pick === side} aria-label={label}>
         <span className="ck"><Check size={16} /></span>
         <span className="nm">{name}</span>
         {decided && <span className="sc">{side === 1 ? m.score1 : m.score2}</span>}
@@ -69,7 +69,8 @@ export default function MatchCard({ m, tip, stat, own, user, now, onPick, onNeed
   const p1 = stat?.pick1, p2 = stat?.pick2, tot = (p1 ?? 0) + (p2 ?? 0);
 
   return (
-    <article className={`card in${locked ? ' locked' : ''}`} style={{ '--i': i }}>
+    <article className={`card rv${locked ? ' locked' : ''}${pick ? ' picked p' + pick : ''}`} style={{ '--i': i % 6 }} onPointerMove={tilt} onPointerLeave={untilt}>
+      <span className="glow" aria-hidden="true" />
       <div className="meta">
         <span className={`tag ${m.game}`}>{m.game === 'cs2' ? 'CS2' : 'LOL'}</span>
         <span className="round">{m.round} · {m.format}</span>
@@ -107,12 +108,11 @@ export default function MatchCard({ m, tip, stat, own, user, now, onPick, onNeed
         {res}
         {!decided && pick && !locked && <span>Tipped elmentve – a kezdésig módosíthatod.</span>}
         {!decided && pick && locked && <span><Lock size={13} style={{ verticalAlign: '-2px' }} /> Tipped: {pick === 1 ? m.team1 : m.team2}{tip.series ? ` (${tip.series})` : ''}</span>}
-        {!pick && !locked && !blocked && <span>{user ? 'Kattints arra a csapatra, amelyik szerinted nyer.' : 'Lépj be a tippeléshez.'}</span>}
+        {!pick && !locked && <span>{user ? 'Kattints arra a csapatra, amelyik szerinted nyer.' : 'Lépj be a tippeléshez.'}</span>}
         {!pick && locked && !decided && <span>Erre a meccsre nem tippeltél.</span>}
         <span style={{ marginLeft: 'auto' }}>{stat?.total ? `${stat.total} tippelő` : ''}</span>
       </div>
 
-      {blocked && !decided && <div className="own">Ezen a meccsen te is játszol – a saját meccsedre nem tippelhetsz. Sok sikert!</div>}
     </article>
   );
 }

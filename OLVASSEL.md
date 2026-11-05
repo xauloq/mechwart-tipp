@@ -1,6 +1,6 @@
 # Mechwart Tippverseny – beállítás
 
-Next.js weboldal + Supabase (adatbázis és Discord-bejelentkezés). Az oldal statikus, bárhol futtatható; a szabályokat (határidő, egy tipp/meccs, saját meccs tiltása) az adatbázis kényszeríti ki, a böngészőből nem lehet megkerülni.
+Next.js weboldal + Supabase (adatbázis és Discord-bejelentkezés). Az oldal statikus, bárhol futtatható; a szabályokat (határidő, egy tipp/meccs) az adatbázis kényszeríti ki, a böngészőből nem lehet megkerülni.
 
 Kb. 20–30 perc az első beállítás. A sorrend számít.
 
@@ -44,6 +44,10 @@ Ezután: nyisd meg az oldalt → **Belépés Discorddal** → tippelj egyet pró
 
 ---
 
+## Frissítés (nov. 5.) – ha a régi `schema.sql`-t már lefuttattad
+
+SQL Editor → New query → a `supabase/frissites_2.sql` tartalma → Run. (Új projektnél elég a `schema.sql`, abban már benne van.)
+
 ## Meccsnapon
 
 **Eredmény beírása** (meccs után): Supabase → **Table Editor → matches** → a meccs sorában `winner` = 1 (az első csapat nyert) vagy 2, `score1` / `score2` = végeredmény (Bo1-nél a körök, pl. 13 és 9) → Save. A ranglista azonnal frissül.
@@ -66,7 +70,9 @@ LoL: lol-b1-paladins · lol-b1-l9 · lol-a1-minipajtik · lol-a1-elo
 
 ## Jó tudni
 
-- **Saját meccs**: aki a nevezési listában Discord-névvel szerepel egy csapatnál, az a csapata meccsére nem tippelhet (a `team_members` tábla alapján). Ha valakit rosszul szűr: Table Editor → `team_members`.
+- **Saját meccs**: mindenki tippelhet, a saját csapatára is.
+- **Ranglista**: csak az jelenik meg, akinek már van kiértékelt (lejátszott meccsre leadott) tippje.
+- **Főnyeremény**: Cyberpunk 2077 – a képet a Steam áruházból tölti be az oldal.
 - **Szüneteltetés**: az ingyenes Supabase-projektet egy hét tétlenség után leállítja. A téli szünet után a Supabase felületén **Restore project** – az adatok megmaradnak.
 - **Csalás**: több fiókkal tippelni tilos (Szabályok fül). A `profiles` táblában látod, ki lépett be.
 - **Kipróbálás helyben**: `npm install`, `.env.local` a `.env.example` alapján, `npm run dev` → http://localhost:3000. Supabase-adatok nélkül az oldal **demó módban** indul (kitalált meccsekkel).
