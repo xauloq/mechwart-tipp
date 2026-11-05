@@ -1,5 +1,7 @@
+import '@fontsource-variable/inter';
 import './globals.css';
 import Cursor from '../components/Cursor';
+import CookieNote from '../components/CookieNote';
 
 export const metadata = {
   title: 'Mechwart Tippverseny',
@@ -11,14 +13,10 @@ export const viewport = { themeColor: '#060a14', width: 'device-width', initialS
 export default function RootLayout({ children }) {
   return (
     <html lang="hu">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-      </head>
       <body>
         <div className="bg" aria-hidden="true" />
         {children}
+        <CookieNote />
         <Cursor />
       </body>
     </html>

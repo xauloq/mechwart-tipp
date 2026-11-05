@@ -5,7 +5,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { background: var(--bg); color-scheme: dark; overflow-x: hidden; }
-body { min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body { min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Inter Variable', 'Inter', 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 a { color: var(--blue2); }
 ::selection { background: rgba(236,30,36,.45); }
@@ -445,3 +445,14 @@ a.btn { text-decoration: none; }
 /* a rendes egérmutató elrejtése – csak ha a saját kurzor fut (JS teszi rá a html-re) */
 @media (pointer: fine) { html.cur-hide, html.cur-hide * { cursor: none !important; } }
 @media (pointer: coarse), (hover: none) { .cur-dot, .cur-ring { display: none; } }
+
+/* ---------- adattárolási tájékoztató ---------- */
+.cnote { position: fixed; left: 20px; bottom: 20px; z-index: 60; max-width: 420px; display: grid; gap: 12px;
+  background: rgba(13,26,52,.94); backdrop-filter: blur(14px); border: 1px solid var(--line2); border-radius: 16px; padding: 16px 18px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.5); animation: tin .5s var(--ease); }
+.cnote p { font-size: 14px; line-height: 1.5; color: var(--soft); }
+.cnote p b { color: #fff; }
+.cnote-a { display: flex; gap: 14px; align-items: center; justify-content: flex-end; }
+.cnote-a a { font-size: 14px; font-weight: 800; color: var(--blue2); text-decoration: none; }
+.cnote-a a:hover { text-decoration: underline; }
+@media (max-width: 640px) { .cnote { left: 12px; right: 12px; bottom: 12px; max-width: none; } }

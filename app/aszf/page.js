@@ -78,7 +78,7 @@ const S = [
     <p><b>Meddig tároljuk?</b> A Tippverseny végéig és a nyeremény átadásáig, de legkésőbb 2027. június 30-ig; utána az adatokat töröljük.</p>
     <p><b>Kik férnek hozzá technikailag?</b> Az oldal tárhelye a Vercel, az adatbázis és a bejelentkezés a Supabase (az adatok az Európai Unióban, Frankfurtban tárolódnak), a bejelentkezést a Discord végzi. Ezek a szolgáltatók adatfeldolgozóként, a saját adatvédelmi feltételeik szerint működnek.</p>
     <p><b>Milyen jogaid vannak?</b> Kérheted az adataidhoz való hozzáférést, a helyesbítést, a törlést (ezzel a Tippversenyből is kilépsz), és a hozzájárulásodat bármikor visszavonhatod – ehhez írj a szervezőknek a Discordon. Panasszal a Nemzeti Adatvédelmi és Információszabadság Hatósághoz (NAIH, naih.hu) fordulhatsz.</p>
-    <p><b>Sütik:</b> az oldal csak a bejelentkezés megtartásához szükséges adatot tárolja a böngésződben, követő- vagy reklámsütiket nem használ.</p>
+    <p><b>Sütik és böngészőtárhely:</b> az oldal csak a működéshez feltétlenül szükséges adatot tárolja a böngésződben: a bejelentkezés megtartásához szükséges azonosítót, és azt, hogy ezt a tájékoztatót már bezártad. Ezekhez a jogszabály (az elektronikus hírközlésről szóló 2003. évi C. törvény 155. § (4) bekezdése) szerint nem kell külön hozzájárulás. Követő-, statisztikai vagy reklámsütiket nem használunk. A betűtípust a saját tárhelyünkről töltjük be; a főnyeremény képe a Steam áruház szerveréről töltődik be, ezért ehhez a Valve (Steam) látja a böngésződ IP-címét.</p>
   </>],
 ];
 
