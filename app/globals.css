@@ -424,3 +424,21 @@ a.btn { text-decoration: none; }
   .top .brand b { font-size: 19px; }
   .am-meta { width: 100%; order: 5; }
 }
+
+/* ---------- saját kurzor (pont + utána úszó gyűrű) ---------- */
+.cur-dot, .cur-ring { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity .3s; will-change: transform; }
+.cur-dot.on, .cur-ring.on { opacity: 1; }
+.cur-dot span, .cur-ring span { position: absolute; left: 0; top: 0; display: block; translate: -50% -50%; border-radius: 50%; }
+.cur-dot span { width: 6px; height: 6px; background: #fff; box-shadow: 0 0 10px rgba(255,255,255,.8); transition: background .25s, box-shadow .25s, scale .25s var(--ease); }
+.cur-ring span { width: 34px; height: 34px; border: 1.5px solid rgba(255,255,255,.5);
+  transition: width .35s var(--ease), height .35s var(--ease), border-radius .35s var(--ease), border-color .3s, background .3s, box-shadow .3s, scale .2s var(--ease); }
+.cur-ring[data-s='hover'] span { width: 54px; height: 54px; border-color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+.cur-ring[data-s='card'] span { width: 46px; height: 46px; border-color: rgba(255,255,255,.28); }
+.cur-ring[data-s='red'] span { width: 66px; height: 66px; border-color: var(--red2); background: rgba(236,30,36,.12); box-shadow: 0 0 26px rgba(236,30,36,.4); }
+.cur-ring[data-s='blue'] span { width: 66px; height: 66px; border-color: var(--blue2); background: rgba(47,111,214,.14); box-shadow: 0 0 26px rgba(121,168,255,.4); }
+.cur-dot[data-s='red'] span { background: var(--red2); box-shadow: 0 0 12px var(--red2); }
+.cur-dot[data-s='blue'] span { background: var(--blue2); box-shadow: 0 0 12px var(--blue2); }
+.cur-ring[data-s='text'] span { width: 3px; height: 28px; border-radius: 2px; border-color: transparent; background: rgba(121,168,255,.7); }
+.cur-dot[data-s='text'] span { scale: 0; }
+.cur-ring.down span { scale: .82; }
+@media (pointer: coarse), (hover: none) { .cur-dot, .cur-ring { display: none; } }

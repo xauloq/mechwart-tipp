@@ -1,4 +1,5 @@
 import './globals.css';
+import Cursor from '../components/Cursor';
 
 export const metadata = {
   title: 'Mechwart Tippverseny',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
       <body>
         <div className="bg" aria-hidden="true" />
         {children}
+        <Cursor />
       </body>
     </html>
   );
