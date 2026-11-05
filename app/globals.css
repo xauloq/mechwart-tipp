@@ -331,23 +331,14 @@ details.past[open] summary svg { transform: rotate(90deg); }
 .rules-more { margin-top: 18px; font-size: 14px; color: var(--muted); font-weight: 700; }
 .cta span a { color: var(--blue2); }
 
-/* ---------- Tippverseny felirat: oda-vissza futó fénycsík, alatta teljes szélességű vonal ---------- */
-.ttl-w { display: inline-flex; flex-direction: column; align-items: stretch; }
+/* ---------- Tippverseny felirat: oda-vissza futó fénycsík ---------- */
 .sweep { display: inline-block; color: transparent; -webkit-background-clip: text; background-clip: text;
   background-image: linear-gradient(100deg, #fff 0%, #fff 40%, var(--red2) 47%, var(--blue2) 53%, #fff 60%, #fff 100%);
   background-size: 300% 100%; background-position: 100% 0;
   animation: sweep 3.6s cubic-bezier(.45, 0, .25, 1) .6s infinite alternate;
   filter: drop-shadow(0 10px 40px rgba(236,30,36,.22)); }
 @keyframes sweep { 0%, 12% { background-position: 100% 0; } 88%, 100% { background-position: 0% 0; } }
-.ttl-u { position: relative; display: block; height: 4px; margin-top: 12px; border-radius: 4px; overflow: hidden;
-  background: linear-gradient(90deg, var(--red), var(--blue2)); transform: scaleX(0); transform-origin: left;
-  animation: uline .9s var(--ease) .3s forwards; }
-.ttl-u::after { content: ''; position: absolute; top: 0; bottom: 0; width: 18%; left: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent);
-  animation: ushine 3.6s cubic-bezier(.45, 0, .25, 1) .6s infinite alternate; }
-@keyframes uline { to { transform: scaleX(1); } }
-@keyframes ushine { 0%, 12% { left: -18%; } 88%, 100% { left: 100%; } }
-@media (prefers-reduced-motion: reduce) { .sweep, .ttl-u::after { animation: none; } .ttl-u { animation: none; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sweep { animation: none; } }
 
 .flogo { display: inline-flex; border-radius: 12px; padding: 4px; transition: transform .25s var(--ease), background .25s; }
 .flogo:hover { transform: translateY(-3px) scale(1.06); background: rgba(255,255,255,.05); }
