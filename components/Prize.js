@@ -27,7 +27,6 @@ export default function Prize() {
           ) : (
             <div className="prize-ph">CYBERPUNK 2077</div>
           )}
-          <span className="glint" aria-hidden="true" />
         </div>
         <div className="prize-foot">
           <b>Cyberpunk 2077</b>
