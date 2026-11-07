@@ -381,6 +381,7 @@ export default function Admin() {
               </div>
               <div className="sp" />
               <button type="button" className="btn ghost sm" onClick={() => { load(); toast('Frissítve.'); }} aria-label="Frissítés"><Refresh size={16} /></button>
+              <Link href="/admin/veto/" className="btn ghost sm">Pályaválasztás</Link>
               <button type="button" className="btn sm" onClick={() => setForm('new')}><Plus size={18} /> Új meccs</button>
             </div>
 
