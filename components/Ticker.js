@@ -1,23 +1,23 @@
 'use client';
-import { fmtTime } from './MatchCard';
+import { fmtTime, gameName } from './MatchCard';
 
 const TZ = 'Europe/Budapest';
 const day = (iso) => new Date(iso).toLocaleDateString('hu-HU', { weekday: 'short', timeZone: TZ }).replace('.', '');
 
-// végtelenített futószalag a közelgő meccsekkel
+// Vékony, egysoros hírsáv a közelgő meccsekkel; fölé vitt egérrel megáll
 export default function Ticker({ matches }) {
   if (!matches.length) return null;
-  const items = matches.slice(0, 12).map((m) => (
-    <span key={m.id} className="tk-it">
-      <i className={`tk-g ${m.game}`}>{m.game === 'cs2' ? 'CS2' : 'LOL'}</i>
-      <b>{m.team1}</b><em>vs</em><b>{m.team2}</b>
-      <small>{day(m.kickoff)} {fmtTime(m.kickoff)}</small>
+  const list = matches.slice(0, 12);
+  const items = (hidden) => list.map((m) => (
+    <span key={m.id} className="tk-it" aria-hidden={hidden || undefined}>
+      <time>{day(m.kickoff)} {fmtTime(m.kickoff)}</time>
+      <b>{m.team1} – {m.team2}</b>
+      <small>{gameName(m.game)}</small>
     </span>
   ));
   return (
-    <div className="ticker rv" aria-label="Közelgő meccsek">
-      <div className="tk-tag"><span className="live" /> KÖVETKEZŐ</div>
-      <div className="tk-w"><div className="tk-track" style={{ animationDuration: `${Math.max(24, matches.length * 7)}s` }}>{items}{items}</div></div>
+    <div className="ticker rv" role="region" aria-label="Közelgő meccsek">
+      <div className="tk-track" style={{ animationDuration: `${Math.max(40, list.length * 12)}s` }}>{items(false)}{items(true)}</div>
     </div>
   );
 }

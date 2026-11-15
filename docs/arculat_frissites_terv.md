@@ -138,3 +138,16 @@ Jelenleg nincs nyitott kérdés. ✅ **Eldöntve (nov. 15.):** üveg valódi fé
 6. Előnézet képernyőképekkel, csak utána élesítés (Vercel).
 
 A szervezői felület (`/admin`, `/admin/veto`) csak az új alapszíneket és gombokat kapja meg, a felépítése nem változik.
+
+## 11. Megvalósítás állapota (2026. nov. 15.)
+
+Az `arculat-terv` ágon elkészült a terv 1–5. lépése. Ami a tervhez képest pontosítás:
+
+- **Valódi fénytörés csak a lebegő felületeken van** (fejléc, fülsáv, alsó értesítőkártyák), asztali Chrome/Edge/Opera/Brave alatt. A fénytörés csak ott látszik, ahol az üveg alatt tartalom mozog; a helyben álló kártyák alatt egyszínű háttér van, ott nem látszana semmi, viszont lassítaná az oldalt. A kártyák ezért egyszerű üvegfelületet kaptak. Safari, Firefox és telefon: elmosott üveg.
+- **Ranglista, csoporton belüli sorrend:** a csoport = pontszám, a helyezés közös. A lenyitott névsor a „több talált tipp, utána név” sorrendet követi, mert a szabályzat holtversenynél a több talált tippet nézi (most még mindenkinél pont = találat, így ez egyelőre névsor).
+- **Tipp előtti megoszlás:** a hero a kezdés előtt csak a tippelők számát mutatja, a százalékokat csak a kezdés után – ugyanúgy, ahogy eddig (az adatbázis addig nem is adja ki).
+- **Főnyeremény-kártya:** megmaradt, a bemutatkozó rész mellett, mozgás nélkül.
+- **Üzenetek (pl. „Tipp mentve”):** gépen jobb alul, telefonon alul középen jelennek meg.
+- **„Megújult a Tippverseny” kártya:** a `lib/relaunch.js` fájlban a `RELAUNCH_AT` értékét kell az élesítés időpontjára állítani (most `null`, tehát nem jelenik meg). Kipróbálni az oldal címe után írt `#megujult` jelöléssel lehet.
+- Törölve: `Cursor.js`, `Roll.js`, `CookieNote.js` (a sütitájékoztató a `Notices.js`-be került), a részecskék, a fényfolt, a billegés és a konfetti.
+

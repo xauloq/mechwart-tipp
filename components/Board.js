@@ -1,26 +1,16 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Crown } from './icons';
+import { ChevDown } from './icons';
 import { useInView } from './FX';
 
-function Row({ r, me, i }) {
-  const [ref, vis] = useInView();
-  return (
-    <div ref={ref} className={`lr rv${vis ? ' vis' : ''}${r.user_id === me ? ' me' : ''}`} style={{ '--i': i % 8 }}>
-      <span className="rk">{r.rank}.</span>
-      <Avatar name={r.name} url={r.avatar_url} />
-      <span className="nm">{r.name}</span>
-      <span className="acc">{r.correct}/{r.decided} talált</span>
-      <span className="pts"><CountUp value={r.points} /></span>
-    </div>
-  );
-}
-
-export function CountUp({ value, ms = 900 }) {
+// Pontszámláló: egyszer, röviden fut fel; értékváltáskor az előző értékről indul
+export function CountUp({ value, ms = 600 }) {
   const [v, setV] = useState(0);
   const from = useRef(0);
   useEffect(() => {
-    const start = performance.now(), a = from.current, b = Number(value) || 0;
+    const a = from.current, b = Number(value) || 0;
+    if (a === b || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { from.current = b; setV(b); return; }
+    const start = performance.now();
     let raf;
     const step = (t) => {
       const k = Math.min(1, (t - start) / ms), e = 1 - Math.pow(1 - k, 3);
@@ -34,39 +24,88 @@ export function CountUp({ value, ms = 900 }) {
 }
 
 export const Avatar = ({ name, url, className = 'av' }) => (
-  <span className={className} aria-hidden="true">{url ? <img src={url} alt="" /> : (name || '?').trim().charAt(0).toUpperCase()}</span>
+  <span className={className} aria-hidden="true">{url ? <img src={url} alt="" loading="lazy" /> : (name || '?').trim().charAt(0).toUpperCase()}</span>
 );
 
-// helyezés holtversennyel: azonos pontszám = azonos hely
-export function ranked(board) {
-  let last = null, rank = 0;
-  return board.map((r, i) => {
-    const key = `${r.points}|${r.correct}`;
-    if (key !== last) { rank = i + 1; last = key; }
-    return { ...r, rank };
+// Pontcsoportok: egy csoport = egy pontszám. A helyezés az, ahányadik helyen a csoport kezdődik,
+// így az azonos pontszámúak ugyanazon a helyen állnak. Csoporton belül: több talált tipp, majd név.
+export function groupsOf(board) {
+  const rows = [...board].sort((a, b) => b.points - a.points || b.correct - a.correct || String(a.name).localeCompare(String(b.name), 'hu'));
+  const out = [];
+  rows.forEach((r, i) => {
+    let g = out[out.length - 1];
+    if (!g || g.points !== r.points) { g = { points: r.points, rank: i + 1, rows: [] }; out.push(g); }
+    g.rows.push(r);
   });
+  return out;
+}
+
+export function rankOf(board, uid) {
+  if (!uid) return null;
+  const g = groupsOf(board).find((x) => x.rows.some((r) => r.user_id === uid));
+  return g ? { rank: g.rank, size: g.rows.length, points: g.points } : null;
+}
+
+function Group({ g, me, open, toggle, i }) {
+  const [ref, vis] = useInView();
+  const mine = g.rows.some((r) => r.user_id === me);
+  const solo = g.rows.length === 1;
+  const id = `grp-${g.points}`;
+  const head = (
+    <>
+      <span className="rk">{g.rank}.</span>
+      <span className="pts"><b>{g.points}</b> pont</span>
+      {solo ? (
+        <span className="who"><Avatar name={g.rows[0].name} url={g.rows[0].avatar_url} /><span className="nm">{g.rows[0].name}</span>{mine && <em>te</em>}</span>
+      ) : (
+        <>
+          <span className="cnt">{g.rows.length} tippelő{mine && <em>köztük te</em>}</span>
+          <span className="stack" aria-hidden="true">
+            {g.rows.slice(0, 5).map((r) => <Avatar key={r.user_id} name={r.name} url={r.avatar_url} />)}
+            {g.rows.length > 5 && <span className="av more">+{g.rows.length - 5}</span>}
+          </span>
+        </>
+      )}
+      {solo ? <span className="acc">{g.rows[0].correct}/{g.rows[0].decided} talált</span> : <ChevDown size={18} className="chev" />}
+    </>
+  );
+  return (
+    <div ref={ref} data-rv="" className={`grp rv${vis ? ' vis' : ''}${i < 3 ? ` lead l${i + 1}` : ''}${mine ? ' mine' : ''}${open ? ' open' : ''}`} style={{ '--i': Math.min(i, 5) }}>
+      {solo ? <div className="grp-h">{head}</div> : (
+        <button type="button" className="grp-h" aria-expanded={open} aria-controls={id} onClick={toggle}>{head}</button>
+      )}
+      {!solo && open && (
+        <div className="grp-b" id={id}>
+          {mine && <p className="here">Te itt vagy: <b>{g.rank}. hely</b>, holtversenyben {g.rows.length - 1} másik tippelővel.</p>}
+          <ul>
+            {g.rows.map((r) => (
+              <li key={r.user_id} className={r.user_id === me ? 'me' : ''}>
+                <Avatar name={r.name} url={r.avatar_url} /><span className="nm">{r.name}</span><span className="acc">{r.correct}/{r.decided}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Board({ board, me }) {
-  const rows = ranked(board);
-  if (!rows.length) return <div className="empty in">A ranglista az első lejátszott meccs után jelenik meg. Addig is: tippelj!</div>;
-  const top = [rows[1], rows[0], rows[2]];
+  const groups = groupsOf(board);
+  const myPts = groups.find((g) => g.rows.some((r) => r.user_id === me))?.points;
+  const [open, setOpen] = useState(() => new Set());
+  const auto = useRef(false);
+  useEffect(() => {                       // a saját csoport magától nyitva van (egyszer, amikor megvan)
+    if (auto.current || myPts === undefined) return;
+    auto.current = true;
+    setOpen((s) => new Set(s).add(myPts));
+  }, [myPts]);
+  if (!groups.length) return <div className="empty">A ranglista az első lejátszott meccs után jelenik meg. Addig is: tippelj!</div>;
+  const toggle = (p) => () => setOpen((s) => { const n = new Set(s); if (n.has(p)) n.delete(p); else n.add(p); return n; });
   return (
-    <section>
-      <div className="podium">
-        {top.map((r, k) => r ? (
-          <div key={r.user_id} className={`pod in p${k === 1 ? 1 : k === 0 ? 2 : 3}`} style={{ '--i': k }}>
-            {k === 1 && <div className="crown"><Crown size={26} /></div>}
-            <Avatar name={r.name} url={r.avatar_url} />
-            <div className="nm">{r.name}</div>
-            <div className="pt"><CountUp value={r.points} /> pont</div>
-            <div className="blk">{k === 1 ? 1 : k === 0 ? 2 : 3}</div>
-          </div>
-        ) : <div key={k} />)}
-      </div>
-      <div className="lb-list">
-        {rows.map((r, i) => <Row key={r.user_id} r={r} me={me} i={i} />)}
-      </div>
+    <section className="board" aria-label="Ranglista">
+      <p className="board-note">{board.length} tippelő · az azonos pontszámúak ugyanazon a helyen állnak. Kattints egy sorra a nevekért.</p>
+      {groups.map((g, i) => <Group key={g.points} g={g} me={me} i={i} open={open.has(g.points)} toggle={toggle(g.points)} />)}
     </section>
   );
 }
