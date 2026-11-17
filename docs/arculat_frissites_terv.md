@@ -98,7 +98,7 @@ Megnéztem az oldalt (2026. nov. 15.):
 **Gond:** sokan állnak azonos pontszámon (pl. 4 pontnál 7-en, 3 pontnál 20-an), ezért a hosszú, egyenkénti lista nehezen olvasható és igazságtalannak tűnik, mert egyformák is különböző helyezést kapnak.
 
 ✅ **Megoldás: pontcsoportok**
-- Egy sor egy pontszám: például **„1. · 5 pont · 2 tippelő”**, **„3. · 4 pont · 7 tippelő”**, **„10. · 3 pont · 20 tippelő”**. A helyezés az, ahányadik helyen a csoport kezdődik, ezért a csoporton belül mindenki ugyanazon a helyen áll.
+- Egy sor egy pontszám: például **„1. · 5 pont · 2 tippelő”**, **„2. · 4 pont · 7 tippelő”**, **„3. · 3 pont · 20 tippelő”**. A helyezés folyamatos (nov. 17-i javítás: korábban kihagyta a helyezéseket, pl. 1., 3., 5., 14.), a csoporton belül mindenki ugyanazon a helyen áll.
 - A sorban egymásra csúsztatott kis avatarok vannak (max. 5 + „+15”). A sorra kattintva lenyílik, és ábécérendben kiírja a neveket.
 - A **saját sorod** mindig kiemelve látszik, és a csoportod magától nyitva van („Te itt vagy: 3. hely, holtversenyben 7 tippelővel”).
 - A csoporton belül nem rangsorolunk tovább, mert a szabályzat nem ad holtverseny-eldöntést.

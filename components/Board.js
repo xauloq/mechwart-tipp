@@ -27,14 +27,14 @@ export const Avatar = ({ name, url, className = 'av' }) => (
   <span className={className} aria-hidden="true">{url ? <img src={url} alt="" loading="lazy" /> : (name || '?').trim().charAt(0).toUpperCase()}</span>
 );
 
-// Pontcsoportok: egy csoport = egy pontszám. A helyezés az, ahányadik helyen a csoport kezdődik,
-// így az azonos pontszámúak ugyanazon a helyen állnak. Csoporton belül: több talált tipp, majd név.
+// Pontcsoportok: egy csoport = egy pontszám, a helyezés folyamatos (1., 2., 3. …), így az azonos
+// pontszámúak ugyanazon a helyen állnak, és nincs kihagyott helyezés. Csoporton belül: több talált tipp, majd név.
 export function groupsOf(board) {
   const rows = [...board].sort((a, b) => b.points - a.points || b.correct - a.correct || String(a.name).localeCompare(String(b.name), 'hu'));
   const out = [];
-  rows.forEach((r, i) => {
+  rows.forEach((r) => {
     let g = out[out.length - 1];
-    if (!g || g.points !== r.points) { g = { points: r.points, rank: i + 1, rows: [] }; out.push(g); }
+    if (!g || g.points !== r.points) { g = { points: r.points, rank: out.length + 1, rows: [] }; out.push(g); }
     g.rows.push(r);
   });
   return out;
