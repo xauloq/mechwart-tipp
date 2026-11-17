@@ -104,7 +104,7 @@ export default function Board({ board, me }) {
   const toggle = (p) => () => setOpen((s) => { const n = new Set(s); if (n.has(p)) n.delete(p); else n.add(p); return n; });
   return (
     <section className="board" aria-label="Ranglista">
-      <p className="board-note">{board.length} tippelő · az azonos pontszámúak ugyanazon a helyen állnak. Kattints egy sorra a nevekért.</p>
+      <p className="board-note">{board.length} tippelő · az azonos pontszámúak ugyanazon a helyen állnak</p>
       {groups.map((g, i) => <Group key={g.points} g={g} me={me} i={i} open={open.has(g.points)} toggle={toggle(g.points)} />)}
     </section>
   );

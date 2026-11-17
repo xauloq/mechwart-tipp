@@ -1,22 +1,18 @@
 'use client';
 import Link from 'next/link';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { supabase, DEMO, asset, loadPublic, loadMine, saveTip, signIn, isAdmin } from '../lib/supabase';
 import { demoMatches, demoStats, demoBoard, demoUser, demoTips } from '../lib/demo';
-import MatchCard from '../components/MatchCard';
+import { MatchDay, SkeletonDay, dayKey, dayTitle, decidedOf, tipResult } from '../components/MatchRow';
 import Board, { Avatar, CountUp, rankOf } from '../components/Board';
 import Rules from '../components/Rules';
-import { Login, Logout, Chev, Edit } from '../components/icons';
+import { Login, Logout, Edit } from '../components/icons';
 import { useReveal } from '../components/FX';
 import Glass from '../components/Glass';
 import Hero from '../components/Hero';
 import Prize from '../components/Prize';
-import Ticker from '../components/Ticker';
 
 const TZ = 'Europe/Budapest';
-const dayKey = (iso) => new Date(iso).toLocaleDateString('sv-SE', { timeZone: TZ });
-const dayName = (iso) => new Date(iso).toLocaleDateString('hu-HU', { weekday: 'long', timeZone: TZ });
-const dayDate = (iso) => new Date(iso).toLocaleDateString('hu-HU', { month: 'long', day: 'numeric', timeZone: TZ });
 
 function userFrom(session) {
   const u = session?.user;
@@ -25,7 +21,7 @@ function userFrom(session) {
   return { id: u.id, name: m.custom_claims?.global_name || m.full_name || (m.name || '').replace(/#0$/, '') || 'Tippelő', avatar: m.avatar_url || null };
 }
 
-const TABS = [['tippek', 'Tippek'], ['ranglista', 'Ranglista'], ['szabalyok', 'Szabályok']];
+const TABS = [['meccsek', 'Meccsek'], ['eredmenyek', 'Eredmények'], ['ranglista', 'Ranglista'], ['szabalyok', 'Szabályok']];
 
 export default function Page() {
   const [matches, setMatches] = useState([]);
@@ -33,7 +29,7 @@ export default function Page() {
   const [board, setBoard] = useState([]);
   const [tips, setTips] = useState({});
   const [user, setUser] = useState(null);
-  const [tab, setTab] = useState('tippek');
+  const [tab, setTab] = useState('meccsek');
   const [game, setGame] = useState('all');
   const [now, setNow] = useState(() => Date.now());
   const [toasts, setToasts] = useState([]);
@@ -91,14 +87,14 @@ export default function Page() {
     const next = { match_id: matchId, pick, series: series === undefined ? prev?.series ?? null : series };
     if (prev?.pick !== pick && series === null) next.series = null;
     setTips((t) => ({ ...t, [matchId]: next }));
-    if (DEMO) { toast(`Tipp mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`); return; }
+    if (DEMO) { toast(`Mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`); return; }
     const err = await saveTip(matchId, pick, next.series);
     if (err) {
       setTips((t) => { const c = { ...t }; if (prev) c[matchId] = prev; else delete c[matchId]; return c; });
       toast(/row-level security|violates/i.test(err.message) ? 'Erre a meccsre már nem lehet tippelni.' : 'Nem sikerült menteni a tippet. Próbáld újra!', true);
       refreshPublic();
     } else {
-      toast(`Tipp mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`);
+      toast(`Mentve: ${pick === 1 ? m.team1 : m.team2}${next.series ? ` (${next.series})` : ''}`);
     }
   }, [matches, tips, toast, refreshPublic, admin]);
 
@@ -107,16 +103,17 @@ export default function Page() {
   const logout = async () => { if (!DEMO) await supabase.auth.signOut(); };
 
   const shown = matches.filter((m) => game === 'all' || m.game === game);
-  const upcoming = shown.filter((m) => !(m.winner === 1 || m.winner === 2));
-  const past = shown.filter((m) => m.winner === 1 || m.winner === 2).reverse();
-  const days = useMemo(() => {
+  const byDay = (list) => {
     const g = new Map();
-    for (const m of upcoming) { const k = dayKey(m.kickoff); if (!g.has(k)) g.set(k, []); g.get(k).push(m); }
+    for (const m of list) { const k = dayKey(m.kickoff); if (!g.has(k)) g.set(k, []); g.get(k).push(m); }
     return [...g.values()];
-  }, [upcoming]);
+  };
+  const days = byDay(shown.filter((m) => !decidedOf(m)));
+  const pastDays = byDay(shown.filter(decidedOf).reverse());
+  const results = matches.filter(decidedOf).map((m) => tipResult(m, tips[m.id])).filter(Boolean);
+  const hits = results.filter((r) => r.ok).length;
 
   const me = rankOf(board, user?.id);
-  const ticker = matches.filter((m) => !(m.winner === 1 || m.winner === 2) && new Date(m.kickoff).getTime() > now - 3 * 3600000);
   useReveal([tab, game, matches.length, ready]);
   const myTips = Object.keys(tips).length;
 
@@ -134,13 +131,12 @@ export default function Page() {
     return () => removeEventListener('scroll', f);
   }, []);
 
-  let n = 0;
   return (
     <>
       <Glass as="header" refract className={`top float${stuck ? ' stuck' : ''}`}>
         <div className="row">
           <div className="mark" />
-          <div className="brand"><small>MECHWART</small><b>Tippverseny</b></div>
+          <div className="brand"><b>Tippverseny</b></div>
           <div className="sp" />
           {admin && <Link href="/admin/" className="btn ghost sm adm-link"><Edit size={16} /><span>Szervezés</span></Link>}
           {user ? (
@@ -160,34 +156,21 @@ export default function Page() {
       <main className="wrap" id="tartalom">
         {DEMO && <div className="demo">Demó mód – kitalált adatok. A Supabase beállítása után itt az igazi meccsek és tippek látszanak.</div>}
 
-        <section className="intro">
-          <div className="intro-l rv">
-            <div className="kick">CS2 · LEAGUE OF LEGENDS</div>
-            <h1>Mechwart <span className="hl">Tippverseny</span></h1>
-            <p>Tippelj a Mechwart Esport Bajnokság meccseire, gyűjtsd a pontokat, és legyél te a szezon <b>Tippkirálya</b>!</p>
-            {user && admin ? (
-              <div className="org">
-                <b>Szervezőként nem tippelsz</b>
-                <span>Te írod be az eredményeket, ezért a fiókod nem vesz részt a tippversenyben, és a ranglistán sem szerepel.</span>
-                <Link href="/admin/" className="btn sm"><Edit size={16} /> Szervezői felület</Link>
-              </div>
-            ) : user ? (
-              <div className="stats">
-                <div className="stat glass"><b><CountUp value={me?.points ?? 0} /></b><span>Pontod</span></div>
-                <div className="stat glass"><b>{me ? `${me.rank}.` : '–'}</b><span>Helyezés</span></div>
-                <div className="stat glass"><b><CountUp value={myTips} /></b><span>Tipped</span></div>
-              </div>
-            ) : (
-              <div className="cta">
-                <button type="button" className="btn big" onClick={login}><Login size={20} /> Belépés Discorddal</button>
-                <span>Egy kattintás – csak a nevedet és a profilképedet látjuk. A belépéssel elfogadod a <Link href="/aszf/">részvételi szabályzatot és az adatkezelést</Link>.</span>
-              </div>
-            )}
-          </div>
-          <Prize />
+        <section className="mebar rv" aria-label={user ? 'Saját állás' : 'Belépés'}>
+          {user && admin ? (
+            <p>Szervezőként nem tippelsz · <Link href="/admin/">Szervezői felület →</Link></p>
+          ) : user ? (
+            <p className="mine"><span><b><CountUp value={me?.points ?? 0} /></b> pont</span><span><b>{me ? `${me.rank}.` : '–'}</b> hely</span><span><b>{myTips}</b> tipp</span></p>
+          ) : (
+            <div className="join">
+              <p>Tippelj a meccsekre, és legyél a szezon Tippkirálya.</p>
+              <button type="button" className="btn" onClick={login}><Login size={18} /> Belépés Discorddal</button>
+              <small>A belépéssel elfogadod a <Link href="/aszf/">részvételi szabályzatot</Link>.</small>
+            </div>
+          )}
         </section>
 
-        <Ticker matches={ticker} />
+        <Prize />
 
         <Glass as="nav" refract depth={10} className="tabs float" role="tablist" aria-label="Oldalak">
           {TABS.map(([k, l]) => (
@@ -196,38 +179,36 @@ export default function Page() {
           <span className="ind" style={{ left: ind.left, width: ind.width }} />
         </Glass>
 
-        {tab === 'tippek' && (
-          <section key="tippek" className="pane">
-            <div className="chips" role="group" aria-label="Szűrés játék szerint">
-              {[['all', 'Mind'], ['cs2', 'CS2'], ['lol', 'LoL']].map(([k, l]) => (
-                <button key={k} type="button" className="chip" aria-pressed={game === k} onClick={() => setGame(k)}>{l}</button>
-              ))}
-            </div>
-            {ready && days.length === 0 && <div className="empty">Most nincs nyitott meccs. A következő kör párosítása hamarosan érkezik!</div>}
-            {days.map((list) => (
-              <div className="day" key={dayKey(list[0].kickoff) + game}>
-                <div className="dh rv"><h2>{dayName(list[0].kickoff)}</h2><span>{dayDate(list[0].kickoff)}</span></div>
-                <div className="grid">
-                  {list.map((m) => (
-                    <MatchCard key={m.id} i={n++} m={m} tip={tips[m.id]} stat={stats[m.id]} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
-                  ))}
-                </div>
-              </div>
+        {(tab === 'meccsek' || tab === 'eredmenyek') && (
+          <div className="chips" role="group" aria-label="Szűrés játék szerint">
+            {[['all', 'Mind'], ['cs2', 'CS2'], ['lol', 'LoL']].map(([k, l]) => (
+              <button key={k} type="button" className="chip" aria-pressed={game === k} onClick={() => setGame(k)}>{l}</button>
             ))}
-            {past.length > 0 && (
-              <details className="past">
-                <summary><Chev size={18} /> Lejátszott meccsek ({past.length})</summary>
-                <div className="grid">
-                  {past.map((m, i) => (
-                    <MatchCard key={m.id} i={i} m={m} tip={tips[m.id]} stat={stats[m.id]} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
-                  ))}
-                </div>
-              </details>
-            )}
+          </div>
+        )}
+
+        {tab === 'meccsek' && (
+          <section key="meccsek" className="pane">
+            {!ready && <SkeletonDay />}
+            {ready && days.length === 0 && <div className="empty">Most nincs nyitott meccs. A következő kör párosítása hamarosan érkezik.</div>}
+            {days.map((list) => (
+              <MatchDay key={dayKey(list[0].kickoff) + game} list={list} title={dayTitle(list[0].kickoff)} tips={tips} stats={stats} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
+            ))}
+          </section>
+        )}
+
+        {tab === 'eredmenyek' && (
+          <section key="eredmenyek" className="pane">
+            {user && !admin && results.length > 0 && <p className="sum"><b>{hits}</b> találat <b>{results.length}</b> tippből</p>}
+            {!ready && <SkeletonDay />}
+            {ready && pastDays.length === 0 && <div className="empty">Még nincs lejátszott meccs.</div>}
+            {pastDays.map((list) => (
+              <MatchDay key={dayKey(list[0].kickoff) + game} result list={list} title={dayTitle(list[0].kickoff)} tips={tips} stats={stats} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
+            ))}
           </section>
         )}
         {tab === 'ranglista' && <div key="rl" className="pane"><Board board={board} me={user?.id} /></div>}
-        {tab === 'szabalyok' && <div key="sz" className="pane"><Rules /><p className="rules-more">A teljes részvételi szabályzat és az adatkezelési tájékoztató: <Link href="/aszf/">ÁSZF és adatkezelés →</Link></p></div>}
+        {tab === 'szabalyok' && <div key="sz" className="pane"><Rules /><p className="rules-more"><Link href="/aszf/">Részvételi szabályzat és adatkezelés →</Link></p></div>}
 
         <footer className="footer">
           <a className="flogo" href="https://deac.hu/egyeb-szakosztalyok/deac-esport/" target="_blank" rel="noreferrer" title="DEAC E-sport"><img src={asset('/logok/deac.png')} alt="DEAC E-sport" /></a>

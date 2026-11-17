@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import TeamBadge from './TeamBadge';
-import { Check, Lock, ChevL, Chev, ArrowDown } from './icons';
-import { Dist, fmtTime, gameName, seriesOptions } from './MatchCard';
+import { Check, Lock, ChevL, Chev } from './icons';
+import { Dist, fmtTime, gameName, seriesOptions } from './MatchRow';
 
 const TZ = 'Europe/Budapest';
 const dayKey = (t) => new Date(t).toLocaleDateString('sv-SE', { timeZone: TZ });
@@ -70,16 +70,27 @@ export default function Hero({ matches, tips, stats, user, now, ready, onPick, o
     if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.6) go(dx < 0 ? 1 : -1);
   };
 
-  if (!ready) return <section className="hero" aria-busy="true" />;
+  if (!ready) {
+    return (
+      <section className="hero" aria-busy="true" aria-label="Betöltés">
+        <div className="hero-body sk" aria-hidden="true">
+          <i className="skl" style={{ width: 260, height: 18 }} />
+          <div className="hero-vs"><i className="skl hb" /><span /><i className="skl hb" /></div>
+          <i className="skl" style={{ width: 'min(620px, 80%)', height: 'clamp(56px, 12vh, 140px)', marginTop: 32 }} />
+        </div>
+        <div className="hero-foot" />
+      </section>
+    );
+  }
   if (!cur) {
     return (
       <section className="hero">
         <div className="hero-body">
-          <div className="hero-kick"><span>MECHWART ESPORT BAJNOKSÁG</span></div>
+          <p className="hero-line">Mechwart Esport Bajnokság</p>
           <h2 className="hero-empty">Most nincs nyitott meccs</h2>
-          <p className="hero-sub">A következő kör párosítása hamarosan érkezik. Addig nézd meg, hol állsz a ranglistán!</p>
+          <p className="hero-meta">A következő kör párosítása hamarosan érkezik.</p>
         </div>
-        <div className="hero-foot"><a className="hero-down" href="#tartalom"><ArrowDown size={16} /> Ranglista és eredmények</a></div>
+        <div className="hero-foot" />
       </section>
     );
   }
@@ -100,7 +111,7 @@ export default function Hero({ matches, tips, stats, user, now, ready, onPick, o
       <button type="button" className={`hpick t${side}${on ? ' on' : ''}`} onClick={click(side)} disabled={locked} aria-pressed={on}
         aria-label={locked ? `${name}${on ? ' – a tipped' : ''}` : on ? `A tipped: ${name}` : `Tippelek: ${name} nyer`}>
         {on && <span className="ck"><Check size={15} /></span>}
-        <small>{on ? 'Tipped' : 'Tippelek'}</small><span>{name}</span>
+        <span>{name}</span>
       </button>
     );
   };
@@ -108,11 +119,9 @@ export default function Hero({ matches, tips, stats, user, now, ready, onPick, o
   return (
     <section className="hero" ref={root} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} aria-roledescription={list.length > 1 ? 'lapozható' : undefined}>
       <div className="hero-body" key={m.id}>
-        <div className="hero-kick">
-          <span className="gtag">{gameName(m.game)}</span>
-          <span>{locked ? 'MOST MEGY' : m.id === next?.id ? 'KÖVETKEZŐ MECCS' : 'KÉSŐBB'}</span>
-        </div>
-        <p className="hero-sub">{m.round} · {m.format} · {whenText(m.kickoff, now)}</p>
+        <p className="hero-line">
+          {locked && <><i className="dot" /><b>Élő</b> · </>}{gameName(m.game)} · {m.round} · {whenText(m.kickoff, now)}
+        </p>
 
         <div className="hero-vs">
           <div className={`hero-team t1${long ? ' long' : ''}`}><TeamBadge name={m.team1} side={1} size="lg" /><h2>{m.team1}</h2></div>
@@ -121,19 +130,16 @@ export default function Hero({ matches, tips, stats, user, now, ready, onPick, o
         </div>
 
         {locked ? (
-          <div className="hero-live"><b><i className="dot" /> Élő</b><span><Lock size={14} /> A tippelés lezárult{pick ? ` · tipped: ${pick === 1 ? m.team1 : m.team2}${tip.series ? ` (${tip.series})` : ''}` : ''}</span></div>
+          <div className="hero-live"><b>Élő</b><span><Lock size={14} /> {pick ? `Tipped: ${pick === 1 ? m.team1 : m.team2}${tip.series ? ` (${tip.series})` : ''}` : 'A tippelés lezárult'}</span></div>
         ) : (
-          <>
-            <div className="hero-cap">A tippelés zárásáig</div>
-            <Countdown ms={ko - now} />
-          </>
+          <Countdown ms={ko - now} />
         )}
 
         {!locked && <div className="hero-pick" role="group" aria-label="Szerinted ki nyer?">{btn(1)}{btn(2)}</div>}
 
         {!locked && opts.length > 0 && (
           <div className="series center">
-            <span>Pontos állás (+{m.exact_bonus} pont):</span>
+            <span>Pontos állás (+{m.exact_bonus}):</span>
             {opts.map((o) => (
               <button key={o} type="button" className="chip" aria-pressed={tip?.series === o} onClick={() => onPick(m.id, pick, tip?.series === o ? null : o)}>{o}</button>
             ))}
@@ -142,10 +148,7 @@ export default function Hero({ matches, tips, stats, user, now, ready, onPick, o
 
         {locked && <div className="hero-dist"><Dist m={m} stat={stat} /></div>}
 
-        <p className="hero-meta">
-          {stat?.total ? `${stat.total} tippelő` : 'Legyél te az első tippelő'}
-          {!locked && (pick ? ' · a kezdésig módosíthatod' : user ? '' : ' · a tippeléshez lépj be Discorddal')}
-        </p>
+        {!locked && stat?.total > 0 && <p className="hero-meta">{stat.total} tippelő</p>}
       </div>
 
       <div className="hero-foot">
@@ -161,7 +164,6 @@ export default function Hero({ matches, tips, stats, user, now, ready, onPick, o
             <button type="button" className="pg" onClick={() => go(1)} aria-label="Következő meccs"><Chev size={18} /></button>
           </div>
         )}
-        <a className="hero-down" href="#tartalom"><ArrowDown size={16} /> Összes meccs és ranglista</a>
       </div>
     </section>
   );
