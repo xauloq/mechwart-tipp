@@ -353,6 +353,58 @@ button.grp-h:hover { background: rgba(255,255,255,.035); }
   .ticker { overflow-x: auto; -webkit-mask-image: none; mask-image: none; scrollbar-width: none; }
 }
 
+/* ---------- Eredmények fül: lejátszott meccsek sorokban (a letisztított változatból) ---------- */
+.mday { margin-bottom: 32px; }
+.mdh { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin: 0 4px 12px; }
+.mdh h2 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.mdh span { font-size: 15px; font-weight: 500; color: var(--muted); }
+.mlist { list-style: none; border-radius: var(--r); border: 1px solid var(--line); background: var(--glass); box-shadow: inset 0 1px 0 rgba(255,255,255,.07); overflow: hidden; }
+.mrow { display: grid; grid-template-columns: 76px minmax(0, 1fr) 170px; column-gap: 16px; align-items: center; padding: 12px 20px; }
+.mrow + .mrow { border-top: 1px solid var(--line); }
+.mt b { display: block; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mt small { display: block; margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--muted); line-height: 1.3; }
+.mteams { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rt { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 52px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid transparent; text-align: left; font-size: 17px; font-weight: 600; line-height: 1.2;
+  transition: background .2s ease, border-color .2s ease, color .2s; }
+.rt .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.rt:hover:not(:disabled) { background: rgba(255,255,255,.06); border-color: var(--line2); }
+button.rt:active:not(:disabled) { transform: scale(.99); }
+.rt.t1.on { background: rgba(236,30,36,.2); border-color: rgba(255,90,95,.55); }
+.rt.t2.on { background: rgba(47,111,214,.24); border-color: rgba(121,168,255,.6); }
+.rt .ck { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; background: #fff; color: #0b1222; animation: tick .2s var(--ease) both; }
+.rt:disabled { cursor: default; }
+.rt .sc { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rt.lose { color: var(--muted); }
+.rt.lose .badge { opacity: .55; }
+.rt.win .sc { color: #fff; }
+.rt.win .nm::after { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-left: 8px; vertical-align: middle; }
+.mrow.locked .rt:not(.on) { color: var(--muted); }
+.mrow.res .rt.on { background: none; border-color: transparent; }               /* eredményeknél a tipped csak pipa, a szín a győztesé */
+.mst { justify-self: end; text-align: right; }
+.rpts { display: inline-grid; place-items: center; min-width: 40px; height: 28px; padding: 0 10px; border-radius: 999px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rpts.ok { background: rgba(43,196,111,.16); color: #5fdc9a; }
+.rpts.no { background: rgba(255,255,255,.07); color: var(--muted); }
+.mx { grid-column: 2 / -1; margin-top: 8px; }
+.mx.mnote { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.dist.compact .barw { height: 3px; gap: 2px; opacity: .8; }
+.sum { margin: 0 4px 16px; font-size: 15px; color: var(--muted); }
+.sum b { font-size: 22px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+.mrow.res .rt.on { background: none; border-color: transparent; }
+@media (max-width: 860px) {
+  .mrow { grid-template-columns: 64px minmax(0, 1fr); }
+  .mst { grid-column: 2; justify-self: start; margin-top: 4px; }
+  .mrow.res .mst { grid-column: 1; grid-row: 2; justify-self: start; margin-top: 8px; }
+}
+@media (max-width: 699px) {
+  .mrow { grid-template-columns: 1fr auto; padding: 12px 12px 12px 16px; row-gap: 8px; }
+  .mt { display: flex; align-items: baseline; gap: 8px; }
+  .mt small { margin: 0; }
+  .mteams { grid-column: 1 / -1; grid-row: 2; grid-template-columns: 1fr; gap: 4px; }
+  .mst, .mrow.res .mst { grid-column: 2; grid-row: 1; justify-self: end; margin: 0; }
+  .mx { grid-column: 1 / -1; margin-top: 0; }
+  .rt { min-height: 48px; }
+}
+
 /* ---------- ÁSZF oldal ---------- */
 .legal { max-width: 860px; padding-top: 40px; }
 .lg-head { margin-bottom: 26px; }

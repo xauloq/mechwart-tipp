@@ -4,9 +4,10 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { supabase, DEMO, asset, loadPublic, loadMine, saveTip, signIn, isAdmin } from '../lib/supabase';
 import { demoMatches, demoStats, demoBoard, demoUser, demoTips } from '../lib/demo';
 import MatchCard from '../components/MatchCard';
+import { MatchDay, dayTitle, tipResult } from '../components/MatchRow';
 import Board, { Avatar, CountUp, rankOf } from '../components/Board';
 import Rules from '../components/Rules';
-import { Login, Logout, Chev, Edit } from '../components/icons';
+import { Login, Logout, Edit } from '../components/icons';
 import { useReveal } from '../components/FX';
 import Glass from '../components/Glass';
 import Hero from '../components/Hero';
@@ -25,7 +26,7 @@ function userFrom(session) {
   return { id: u.id, name: m.custom_claims?.global_name || m.full_name || (m.name || '').replace(/#0$/, '') || 'Tippelő', avatar: m.avatar_url || null };
 }
 
-const TABS = [['tippek', 'Tippek'], ['ranglista', 'Ranglista'], ['szabalyok', 'Szabályok']];
+const TABS = [['tippek', 'Tippek'], ['eredmenyek', 'Eredmények'], ['ranglista', 'Ranglista'], ['szabalyok', 'Szabályok']];
 
 export default function Page() {
   const [matches, setMatches] = useState([]);
@@ -109,6 +110,13 @@ export default function Page() {
   const shown = matches.filter((m) => game === 'all' || m.game === game);
   const upcoming = shown.filter((m) => !(m.winner === 1 || m.winner === 2));
   const past = shown.filter((m) => m.winner === 1 || m.winner === 2).reverse();
+  const pastDays = (() => {
+    const g = new Map();
+    for (const m of past) { const k = dayKey(m.kickoff); if (!g.has(k)) g.set(k, []); g.get(k).push(m); }
+    return [...g.values()];
+  })();
+  const results = matches.filter((m) => m.winner === 1 || m.winner === 2).map((m) => tipResult(m, tips[m.id])).filter(Boolean);
+  const hits = results.filter((r) => r.ok).length;
   const days = useMemo(() => {
     const g = new Map();
     for (const m of upcoming) { const k = dayKey(m.kickoff); if (!g.has(k)) g.set(k, []); g.get(k).push(m); }
@@ -214,16 +222,20 @@ export default function Page() {
                 </div>
               </div>
             ))}
-            {past.length > 0 && (
-              <details className="past">
-                <summary><Chev size={18} /> Lejátszott meccsek ({past.length})</summary>
-                <div className="grid">
-                  {past.map((m, i) => (
-                    <MatchCard key={m.id} i={i} m={m} tip={tips[m.id]} stat={stats[m.id]} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
-                  ))}
-                </div>
-              </details>
-            )}
+          </section>
+        )}
+        {tab === 'eredmenyek' && (
+          <section key="eredmenyek" className="pane">
+            <div className="chips" role="group" aria-label="Szűrés játék szerint">
+              {[['all', 'Mind'], ['cs2', 'CS2'], ['lol', 'LoL']].map(([k, l]) => (
+                <button key={k} type="button" className="chip" aria-pressed={game === k} onClick={() => setGame(k)}>{l}</button>
+              ))}
+            </div>
+            {user && !admin && results.length > 0 && <p className="sum"><b>{hits}</b> találat <b>{results.length}</b> tippből</p>}
+            {ready && pastDays.length === 0 && <div className="empty">Még nincs lejátszott meccs.</div>}
+            {pastDays.map((list) => (
+              <MatchDay key={dayKey(list[0].kickoff) + game} result list={list} title={dayTitle(list[0].kickoff)} tips={tips} stats={stats} user={user} now={now} onPick={onPick} onNeedLogin={needLogin} />
+            ))}
           </section>
         )}
         {tab === 'ranglista' && <div key="rl" className="pane"><Board board={board} me={user?.id} /></div>}
